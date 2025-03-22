@@ -15,8 +15,14 @@ function create_namespace() {
     if [ $NS -eq 0 ]; then
         msg "Namespace $NAMESPACE localizado, no es necesaria su creacion"
     else
-        msg_warn_idented "Namespace $NAMESPACE no existe - se procede a su creacion"
+        msg_warn "Namespace $NAMESPACE no existe - se procede a su creacion"
         msg "Applying $NAMESPACE namespace"
+
+       if [ ! -f namespace.yml ]; then
+            msg_warn "El fichero namespace.yml no existe"
+            return 1
+        fi
+
         if [ "$VERBOSE" -eq 0 ]; then
             kubectl apply -f namespace.yml &>/dev/null
         else
@@ -167,9 +173,9 @@ function kube_apply() {
     4) # ****************************** LINKERD ******************************
         #create_namespace "linkerd" --> La instalacion del cliente por defecto crea el mismo el namespace linkerd
         install_linkerd
-        apply_linkerd
-        install_emojivoto
-        install_viz
+        #apply_linkerd
+        # install_emojivoto
+        # install_viz
         ;;
     5) # ************************* KEYCLOAK ******************************
         kubectl get namespaces
@@ -181,27 +187,21 @@ function kube_apply() {
         kubectl -n keycloak port-forward svc/keycloak 8080:8080
         ;;
     6) # ****************************** CONFLUENT ******************************
-        echo "Confluent"
         install_confluent
         ;;
     7) # ********************************* KLAW ********************************
-        echo "Klaw"
         install_klaw
         ;;
     8) # ******************************** KARAVAN ******************************
-        echo "Karavan"
         install_karavan
         ;;
     9) # ******************************** SOLACE *******************************
-        echo "Solace"
         install_solace
         ;;
     10) # ******************************** N8N *********************************
-        echo "n8n"
         install_n8n
         ;;
     11) # ******************************* ISTIO ********************************
-        echo "Istio"
         install_istio
         ;;
     esac
@@ -398,30 +398,32 @@ function apply_resources() {
 
 
 function port_forward() {
+    
     PORT_FORWARD=$1
     PORT=$2
     SERVICE=$3
+
     msg "PORT FORWARD SVC" "$SERVICE $PORT_FORWARD:$PORT"
+    msg "Cheking port forward in use"
+    PID_PORT=$(lsof -i :$PORT_FORWARD | awk '{print $2}' | tail -1)
 
-
-
-    PID_PORT_KARAVAN=$(lsof -i :8899 | awk '{print $2}' | tail -1)
-    PUERTO_KARAVAN=8899
-    lsof -i tcp:$PUERTO_KARAVAN &>/dev/null
-    if [ $? -eq 0 ]; then
-        msg_info_idented "PID_PORT_KARAVAN $PID_PORT_KARAVAN localizado, se procede a matarlo"
-        kill -9 $PID_PORT_KARAVAN
+    if [ "$VERBOSE" -eq 0 ]; then
+        lsof -i tcp:$PORT_FORWARD &>/dev/null
     else
-        msg_warn_idented "PID_PORT_KARAVAN $PID_PORT_KARAVAN no existe, dashabord ya desconectado port forward"
+        lsof -i tcp:$PORT_FORWARD
     fi
-
-    #kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT & disown
-
+    
+    if [ $? -eq 0 ]; then
+        msg_info "PID_PORT $PID_PORT de $SERVICE localizado, se procede a matarlo"
+        kill -9 $PID_PORT
+    else
+        msg_warn "PID_PORT $PID_PORT de $PORT_FORWARD no existe, dashabord ya desconectado port forward"
+    fi
 
     echo
     if [ "$VERBOSE" -eq 0 ]; then
-        kubectl -n karavan port-forward svc/$SERVICE $PORT_FORWARD:$PORT & disown &>/dev/null
+        kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT & disown &>/dev/null
     else
-        kubectl -n karavan port-forward svc/$SERVICE $PORT_FORWARD:$PORT & disown
+        kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT & disown
     fi
 }

@@ -7,7 +7,6 @@ ToolOps is a tool designed to automate the provisioning of tools in local instal
 ## Features
 
 - **Automation**: Reduces the time and effort required to configure tools manually.
-- **Scalability**: Can handle the provisioning of tools in multiple local environments.
 - **Flexibility**: Supports a wide range of tools and custom configurations.
 
 ## Requirements

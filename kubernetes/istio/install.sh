@@ -80,7 +80,9 @@ function install_istio() {
     kubectl -n istio port-forward "svc/productpage" $PORT:$PORT & \
     for i in $(seq 1 200); do curl -s -o /dev/null "http://localhost:9080/productpage"; done
 
-
+    # port_forward "3000" "3000" grafana
+    # port_forward "16685" "80" tracing
+    # port_forward "9080" "9080" productpage
 }
 
 #FUNNCIONA

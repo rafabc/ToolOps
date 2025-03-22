@@ -61,7 +61,7 @@ function launch_menu_compose_tools() {
 function launch_menu_cloud() {
 
     clear
-    msg_task "Select kubernetes action"
+    msg_task "Select cloud"
     printf "\n%s$GREEN_BOLD%s"
     OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  AWS")
     OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  AZURE")
@@ -79,7 +79,7 @@ function launch_menu_cloud() {
 function launch_menu_aws_tools() {
 
     clear
-    msg_task "Select kubernetes action"
+    msg_task "Select aws tool"
     printf "\n%s$GREEN_BOLD%s"
 
     OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DYNAMODB")
@@ -97,7 +97,7 @@ function launch_menu_aws_tools() {
 
 function launch_menu_tool_actions() {
     clear
-    msg_task "Select product action"
+    msg_task "Select compose action"
     printf "\n%s$CYAN_BOLD%s"
     OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  BUILD & UP")
     OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  START")
@@ -120,7 +120,7 @@ function launch_menu_tool_actions() {
 function launch_menu_kube_tools() {
 
     clear
-    msg_task "Select kubernetes action"
+    msg_task "Select tool to deploy in kubernetes"
     printf "\n%s$GREEN_BOLD%s"
     OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  FREE PLACE")
     OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KUBERNETES DASHOBOARD")

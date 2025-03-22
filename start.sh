@@ -79,13 +79,13 @@ function execute_compose_tool_action() {
     0)
         #pre tested 6.2.0
         export CONFLUENT_VERSION="7.3.0"
-        cd tools/confluent
+        cd compose/confluent
         msg "TOOL SELECTED CONFLUENT WITH ACTION $action_selected"
         sleep 1
         exec_tool_action $action_selected
         ;;
     1)
-        cd tools/jenkins
+        cd compose/jenkins
         msg "TOOL SELECTED JENKINS WITH ACTION $action_selected"
         sleep 1
         exec_tool_action $action_selected
@@ -93,42 +93,42 @@ function execute_compose_tool_action() {
         docker-compose exec jenkins apt install jq -y
         ;;
     2)
-        cd tools/gitlab
+        cd compose/gitlab
         msg "TOOL SELECTED GITLAB WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
     3)
-        cd tools/wso2/4.1.0
+        cd compose/wso2/4.1.0
         msg "TOOL SELECTED WSO2 WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
     4)
-        cd tools/nexus
+        cd compose/nexus
         msg "TOOL SELECTED NEXUS WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
     5)
-        cd tools/mailhog
+        cd compose/mailhog
         msg "TOOL SELECTED MAILHOG WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
     6)
-        cd tools/redis
+        cd compose/redis
         msg "TOOL SELECTED REDIS WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
     7)
-        cd tools/flink
+        cd compose/flink
         msg "TOOL SELECTED FLINK WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
     8)
-        cd tools/prometheus
+        cd compose/prometheus
         msg "TOOL SELECTED PROMETHEUS WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
     9)
-        cd tools/klaw
+        cd compose/klaw
         msg "TOOL SELECTED KLAW WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;

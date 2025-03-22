@@ -13,9 +13,9 @@ services:
         - '8083:80'
         - '2223:22'
       volumes:
-        - './tools/gitlab/config:/etc/gitlab'
-        - './tools/gitlab/logs:/var/log/gitlab'
-        - './tools/gitlab/data:/var/opt/gitlab'
+        - './compose/gitlab/config:/etc/gitlab'
+        - './compose/gitlab/logs:/var/log/gitlab'
+        - './compose/gitlab/data:/var/opt/gitlab'
       shm_size: '256m'
     gitlab-runner:
       image: 'gitlab/gitlab-runner:alpine3.15-bleeding'

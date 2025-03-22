@@ -14,8 +14,9 @@ ToolOps is a tool designed to automate the provisioning of tools in local instal
 - **Operating System**: Linux, macOS, Windows
 - **Dependencies**: 
     - Python 3.8+
-    - Docker
-    - Ansible
+    - Docker Compose
+    - Kubernetes
+    - Helm
 
 ## Installation
 

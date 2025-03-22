@@ -18,5 +18,4 @@ function uninstall_redis() {
     msg_info "start delete redis.yml"
     kubectl delete -f redis.yml  &>/dev/null & spinner  $! "Waiting delete redis.yml"
 
-
-}
+    kubectl delete -f namespace.yml & spinner  $! "Waiting delete namespace"

@@ -2,25 +2,37 @@
 
 function install_confluent() {
 
-  #  export TUTORIAL_HOME="https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/quickstart-deploy/kraft-quickstart"
+	#  export TUTORIAL_HOME="https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/quickstart-deploy/kraft-quickstart"
 
-    kubectl create namespace confluent
-    kubectl config set-context --current --namespace confluent
+	NAMESPACE="confluent"
 
-    helm repo add confluentinc https://packages.confluent.io/helm
+	if ! command -v helm &>/dev/null; then
+		msg_warn "Helm could not be found, please install Helm before start."
+		exit 1
+	else
+		if ! helm repo list | grep -q 'confluentinc'; then
+			helm repo add confluentinc https://packages.confluent.io/helm
+			helm repo update
+		else
+			msg_info "Helm repo confluentinc already exists."
+		fi
 
-    helm repo update
+		if [ "$VERBOSE" -eq 0 ]; then
+			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes &>/dev/null
+		else
+			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes
+		fi
+	fi
 
-    helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes
+	create_namespace $NAMESPACE
 
+	if [ "$VERBOSE" -eq 1 ]; then
+		msg_info "Pods"
+		kubectl get pods
+	fi
 
-    msg_info "Pods"
-    kubectl get pods
+	apply_resources "confluent.yml"
 
-    msg_info "Apply"
-    kubectl apply -f confluent.yml
-
-    msg_info "port forward"
-    kubectl port-forward controlcenter-0 9021:9021
+	port_forward "9021" "9021" controlcenter
 
 }

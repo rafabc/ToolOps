@@ -16,5 +16,5 @@ SUN=☀
 STARS=✨ 
 
 
-INFO=ⓘ
+INFO=❗
 WARN=⚠️

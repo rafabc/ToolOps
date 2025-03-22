@@ -81,7 +81,7 @@ function spinner() {
     check_time $ti
     sleep .1
   done
-  printf "\r%s$GREEN%s" "       $INFO  Process $pid finish        "
+  #msg_info "Process $pid finish        "
   echo
   tput cnorm
   wait $pid # capture exit code
@@ -107,7 +107,7 @@ function check_time() {
    # printf "\r%s$RED%s" "       $ERROR  Process hang up  - killing process                 "
     kill -9 $pid &>/dev/null
     echo
-    msg_warn "Proceso $pid matado después de $tiempo_transcurrido segundos."
+    msg_warn "Proceso $pid matado despues de $tiempo_transcurrido segundos."
     echo
   # else
   #   sleep 1

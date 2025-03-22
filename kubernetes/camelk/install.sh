@@ -17,7 +17,6 @@ function install_camelk() {
 
 
     #&  BUILD INTEGRATION FROM IMAGE
-
     #BUIOD CON DOCKER NO ES VALIDO - SE TIENE QUE CONSTRUIR CON KAMEL  RUN PARA QUE LA GESTIONE EL OPERADOR
     #docker build -t host.docker.internal:5000/integration-from-image .
     #docker tag integration-from-image host.docker.internal:5000/integration-from-image:1.0.0

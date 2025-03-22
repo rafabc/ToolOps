@@ -60,7 +60,7 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-enterprise-control-center:7.6.0
+    application: confluentinc/cp-enterprise-control-center:7.3.1
     init: confluentinc/confluent-init-container:2.8.0
   dataVolumeCapacity: 10Gi
   dependencies:
@@ -72,6 +72,30 @@ spec:
     connect:
     - name: connect
       url: http://connect.confluent.svc.cluster.local:8083
+  # env:
+  #   - name: confluent.controlcenter.command.topic.replication
+  #     value: "3"
+  #   - name: confluent.controlcenter.command.topic
+  #     value: "_confluent-command"
+  #   - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
+  #     value: "broker:29092"
+  #   - name: CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER
+  #     value: "connect:8083"
+  #   - name: CONTROL_CENTER_KSQL_KSQLDB1_URL
+  #     value: "http://ksqldb-server:8088"
+  #   - name: CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL
+  #     value: "http://localhost:8088"
+  #   - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL  
+  #     value: "http://schema-registry:8081"
+  #   - name: CONTROL_CENTER_REPLICATION_FACTOR
+  #     value: "3"    
+  #   - name: CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS
+  #     value: "3"
+  #   - name: CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS  
+  #     value: "3"
+  #   - name: CONFLUENT_METRICS_TOPIC_REPLICATION 
+  #     value: "3"
+
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: SchemaRegistry

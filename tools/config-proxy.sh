@@ -4,6 +4,9 @@ source ./scripts/symbols.sh
 source ./scripts/operations.sh
 
 
+PROXY_IP=1.1.1.1
+
+
 if [ "$1" = "on" ]; then
     msg_task "Setting up git proxy"
     git config advice.diverging false
@@ -11,16 +14,16 @@ if [ "$1" = "on" ]; then
     git config --global merge.commit no
     git config --global merge.ff no
     git config --global pull.ff no
-    git config --global http.proxy 46.235.153.164:8080
-    git config --global https.proxy 46.235.153.164:8080
+    git config --global http.proxy $PROXY_IP:8080
+    git config --global https.proxy $PROXY_IP:8080
     check_operation $? "Proxy enabled"
 
-    export HTTP_PROXY=http://46.235.153.164:8080
-    export HTTPS_PROXY=http://46.235.153.164:8080
+    export HTTP_PROXY=http://$PROXY_IP:8080
+    export HTTPS_PROXY=http://$PROXY_IP:8080
 
     msg_task "Setting up VPN proxy for MAC"
-    networksetup -setwebproxy "Wi-fi" 46.235.153.164 8080
-    networksetup -setsecurewebproxy "Wi-fi" 46.235.153.164 8080
+    networksetup -setwebproxy "Wi-fi" $PROXY_IP 8080
+    networksetup -setsecurewebproxy "Wi-fi" $PROXY_IP 8080
     check_operation $? "VPN Proxy enabled"
 
     networksetup -setairportpower en0 off

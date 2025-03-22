@@ -18,15 +18,15 @@ function install_linkerd() {
     linkerd install --crds | kubectl apply -f -
     linkerd install --set proxyInit.runAsRoot=true | kubectl apply -f -
     check_operation $? "Linkerd installed"
-}
 
-function apply_linkerd() {
-    msg_task "Applying linker.yml"
-    kubectl apply -f linkerd.yml
-    msg_info "Checking linkerd"
+    apply_resources "linkerd.yml"
     linkerd check
     check_operation $? "Linkerd apply"
+
+    install_emojivoto
+    install_viz
 }
+
 
 function install_emojivoto() {
     #INSTALL DEMO APP

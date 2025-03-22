@@ -39,18 +39,6 @@ function create_namespace() {
 
 }
 
-function kill_port_forward() {
-    PORT=$1
-    PID_PORT=$(lsof -i :$PORT | awk '{print $2}' | tail -1)
-    lsof -i tcp:$PORT &>/dev/null
-    if [ $? -eq 0 ]; then
-        msg_info_idented "PID_PORT $PID_PORT localizado, se procede a matarlo"
-        kill -9 $PID_PORT
-    else
-        msg_warn_idented "PID_PORT no existe, dashabord ya desconectado port forward"
-    fi
-
-}
 
 function delete_namespace() {
 
@@ -193,7 +181,8 @@ function kube_apply() {
         install_n8n
         ;;
     11) # ******************************* ISTIO ********************************
-        install_istio
+        #install_istio
+        install_istio_with_helm
         ;;
     esac
 

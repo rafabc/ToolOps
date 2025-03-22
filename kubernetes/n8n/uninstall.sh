@@ -21,4 +21,8 @@ function uninstall_n8n() {
     kubectl get crd -oname | grep --color=never 'n8n' | xargs kubectl delete
 
 
+    delete_namespace $NAMESPACE || echo "Namespace finalizer process not found"
+    kubectl delete namespace $NAMESPACE  & spinner  $! "Waiting delete namespace"
+
+
 }

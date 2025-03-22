@@ -19,6 +19,9 @@ source ./scripts/spinner.sh
 source ./kubernetes/linkerd/install.sh
 source ./kubernetes/linkerd/uninstall.sh
 
+source ./kubernetes/keycloak/install.sh
+source ./kubernetes/keycloak/uninstall.sh
+
 source ./kubernetes/confluent/install.sh
 source ./kubernetes/confluent/uninstall.sh
 

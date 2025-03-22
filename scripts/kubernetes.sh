@@ -173,18 +173,9 @@ function kube_apply() {
     4) # ****************************** LINKERD ******************************
         #create_namespace "linkerd" --> La instalacion del cliente por defecto crea el mismo el namespace linkerd
         install_linkerd
-        #apply_linkerd
-        # install_emojivoto
-        # install_viz
         ;;
     5) # ************************* KEYCLOAK ******************************
-        kubectl get namespaces
-        kubectl config get-contexts
-        kubectl apply -f namespace.yml &>/dev/null
-        msg "Cambio a namespace keycloak"
-        kubectl config set-context --current --namespace=keycloak &>/dev/null
-        kubectl apply -f keycloak.yml
-        kubectl -n keycloak port-forward svc/keycloak 8080:8080
+        install_keycloak
         ;;
     6) # ****************************** CONFLUENT ******************************
         install_confluent
@@ -236,9 +227,7 @@ function kube_delete() {
         ;;
 
     5)
-        echo
-        msg "Desinstalamos Keycloak"
-        kubectl delete -f keycloak.yml
+        uninstall_keycloak
         ;;
     6)
         echo

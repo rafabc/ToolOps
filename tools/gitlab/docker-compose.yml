@@ -28,6 +28,3 @@ services:
 #     gitlab-data:
 #         external: true
 
-
-
-#gitlab token: glpat-Wxxzo8HAzsFtzq9C1syB

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: linkerd
+  labels:
+    kubernetes.io/metadata.name: linkerd
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: linkerd-viz
+  labels:
+    kubernetes.io/metadata.name: linkerd-viz
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: emojivoto
+  labels:
+    kubernetes.io/metadata.name: emojivoto

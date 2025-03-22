@@ -1,0 +1,36 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+#  labels:
+#    app.kubernetes.io/component: jenkins-controller
+#    app.kubernetes.io/instance: jenkins
+#    app.kubernetes.io/managed-by: Helm
+#    app.kubernetes.io/name: jenkins
+#    helm.sh/chart: jenkins-3.3.16
+  name: jenkins-tls
+  namespace: jenkins
+spec:
+  host: jenkins-tls-jenkins.apps.gfilab.es
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: jenkins
+  tls:
+    termination: edge
+#    key: |-
+#      -----BEGIN PRIVATE KEY-----
+#      [...]
+#      -----END PRIVATE KEY-----
+#    certificate: |-
+#      -----BEGIN CERTIFICATE-----
+#      [...]
+#      -----END CERTIFICATE-----
+#    caCertificate: |-
+#      -----BEGIN CERTIFICATE-----
+#      [...]
+#      -----END CERTIFICATE-----
+#    destinationCACertificate: |-
+#      -----BEGIN CERTIFICATE-----
+#      [...]
+#      -----END CERTIFICATE-----

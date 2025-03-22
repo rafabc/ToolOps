@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solace  # Replace with your desired deployment name
+  labels:
+    app: solace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: solace
+  template:
+    metadata:
+      labels:
+        app: solace
+    spec:
+      containers:
+      - name: solace
+        image: solace/solace-pubsub-standard:latest
+        resources:
+          requests:
+            cpu: 100m  # Adjust CPU request if needed
+            memory: 2.5Gi  # Increase memory request to 2.5 GiB (or slightly higher)
+          limits:
+            cpu: 250m  # Adjust CPU limit if needed
+            memory: 3.0Gi
+        volumeMounts:
+           - mountPath: /dev/shm
+             name: dshm
+        ports:
+        - containerPort: 8008
+          protocol: TCP
+        - containerPort: 1443
+          protocol: TCP
+        - containerPort: 1943
+          protocol: TCP
+        - containerPort: 1883
+          protocol: TCP
+        - containerPort: 5671
+          protocol: TCP
+        - containerPort: 5672
+          protocol: TCP
+        - containerPort: 8000
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        - containerPort: 8883
+          protocol: TCP
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 9000
+          protocol: TCP
+        - containerPort: 9443
+          protocol: TCP
+        - containerPort: 55554
+          protocol: TCP
+        - containerPort: 55003
+          protocol: TCP
+        - containerPort: 55443
+          protocol: TCP
+        - containerPort: 2222
+          protocol: TCP
+        env:
+          - name: username_admin_globalaccesslevel
+            value: "admin"
+          - name: username_admin_password
+            value: "admin"
+          - name: system_scaling_maxconnectioncount
+            value: "100"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "solace"
+spec:
+  ports:
+  - name: "web-http"
+    port: 8008
+    protocol: "TCP"
+    targetPort: 8008
+  - name: "web-tls"
+    port: 1443
+    protocol: "TCP"
+    targetPort: 1443
+  - name: "semp-manager"
+    port: 8080
+    protocol: "TCP"
+    targetPort: 8080
+  - name: "rest-vpn"
+    port: 9000
+    protocol: "TCP"
+    targetPort: 9000
+  selector:
+    app: "solace"
+  type: "ClusterIP"
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-karavan
+  namespace: solace
+spec:
+  podSelector: {}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          namespace: karavan

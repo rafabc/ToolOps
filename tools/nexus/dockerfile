@@ -1,0 +1,5 @@
+
+FROM sonatype/nexus3
+USER root
+RUN chmod u+x `which ping`
+USER nexus

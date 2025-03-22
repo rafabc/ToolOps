@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sonatype-nexus-pvc
+  namespace: nexus
+spec:
+  storageClassName: sonatype-nexus-sc
+  volumeName: sonatype-nexus-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi

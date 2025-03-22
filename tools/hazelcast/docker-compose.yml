@@ -1,0 +1,56 @@
+---
+version: '3'
+services:
+  hazelcast1:
+    image: "hazelcast/hazelcast:${HAZELCAST_VERSION}"
+    hostname: ${HZ_HOST}
+    container_name: hazelcast1
+    ports:
+      - "5701:5701"
+    environment:
+      HZ_NETWORK_PUBLICADDRESS: ${HZ_HOST}:5701
+      JAVA_OPTS: "-Dhazelcast.config=/opt/hazelcast/config_ext/hazelcast.xml"
+    volumes:
+          - ./tools/hazelcast/data:/data      
+          - ./tools/hazelcast/config:/opt/hazelcast/config_ext
+  hazelcast2:
+    image: "hazelcast/hazelcast:${HAZELCAST_VERSION}"
+    hostname: ${HZ_HOST}
+    container_name: hazelcast2
+    ports:
+      - "5702:5701"
+    environment:
+      HZ_NETWORK_PUBLICADDRESS: ${HZ_HOST}:5702
+      JAVA_OPTS: "-Dhazelcast.config=/opt/hazelcast/config_ext/hazelcast.xml"
+    volumes:
+          - ./tools/hazelcast/data:/data      
+          - ./tools/hazelcast/config:/opt/hazelcast/config_ext
+  hazelcast3:
+    image: "hazelcast/hazelcast:${HAZELCAST_VERSION}"
+    hostname: ${HZ_HOST}
+    container_name: hazelcast3
+    ports:
+      - "5703:5701"
+    environment:
+      HZ_NETWORK_PUBLICADDRESS: ${HZ_HOST}:5703
+      JAVA_OPTS: "-Dhazelcast.config=/opt/hazelcast/config_ext/hazelcast.xml"
+    volumes:
+          - ./tools/hazelcast/data:/data      
+          - ./tools/hazelcast/config:/opt/hazelcast/config_ext          
+  management-center:
+    image: "hazelcast/management-center:${MANAGEMENT_CENTER_VERSION}"
+    hostname: ${HZ_HOST}
+    container_name: management-center
+    ports:
+      - "8083:8080"
+    depends_on:
+      - hazelcast1
+      - hazelcast2    
+    environment:
+      MC_ADMIN_USER: admin
+      MC_ADMIN_PASSWORD: mancenter1243
+      MC_DEFAULT_CLUSTER_MEMBERS: ${HZ_HOST}
+
+# volumes:
+#   h1:
+#   h2:

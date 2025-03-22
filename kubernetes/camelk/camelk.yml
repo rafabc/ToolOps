@@ -1,0 +1,190 @@
+
+apiVersion: camel.apache.org/v1
+kind: IntegrationPlatform
+metadata:
+  name: camel-k
+  namespace: camel-k
+  labels:
+    app: "camel-k"
+spec:
+  build:
+    registry:
+      address: host.docker.internal:5000
+
+---
+apiVersion: camel.apache.org/v1
+kind: IntegrationKit
+metadata:
+  labels:
+    app: camel-k
+    camel.apache.org/kit.layout: fast-jar
+  annotations:
+    camel.apache.org/integration-platform: camel-k
+    camel.apache.org/operator.id: camel-k
+  name: camel-kit
+  namespace: camel-k
+spec: {}
+
+
+
+# #& NO SE PUEDE USAR REDIS CON CAMEL-K VER ENLACE https://github.com/apache/camel-k/issues/4283
+# ---
+# apiVersion: camel.apache.org/v1
+# kind: Integration
+# metadata:
+#   name: iredis
+# spec:
+#   flows:
+#     - from:
+#         uri: timer:tick?period=5000
+#         steps:
+#           - setBody:
+#               simple: "my_key"
+#           - log: ${body}
+#           - to: "spring-redis://10.1.1.74:6379?command=get&key=${body}"
+#           - log: "Message received from Redis: ${body}"
+#   traits:
+#     kamelets:
+#       list: "redis-sink,redis-source"
+#     environment:
+#       vars:
+#       - camel.component.redis.host = 10.1.1.74
+#       - camel.component.redis.port = 6379
+#     camel:
+#       properties:
+#       - command=GET
+#       - redisHost=10.1.1.74
+#       - redisPort=6379
+#   dependencies:
+#       - "camel:kamelet"
+#       - "camel:core"
+#       - "camel:spring-redis"
+
+
+
+#& FUNCOINANDO RECUPERACION DE BD
+---
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  annotations:
+    camel.apache.org/operator.id: camel-k
+    camel.apache.org/kit.registry: host.docker.internal:5000
+  name: camelk-integration-db
+  namespace: camel-k
+spec:
+  # integrationKit: 
+  #   name: camel-kit
+  flows:
+  - from:
+      uri: timer:yaml
+      steps:
+        - set-body:
+            simple: "select * from assets_storages"
+        - to: log:info
+        - to: jdbc:default
+        - set-body:
+            simple: "${bodyAs(String)}"
+        - log: ${body}
+  traits:
+    kamelets:
+      list: "postgresql-source"
+    camel:
+      properties:
+      - quarkus.datasource.db-kind = postgresql
+      - quarkus.datasource.jdbc.url = jdbc:postgresql://10.1.1.88:5432/<<<dbname>>>
+      - quarkus.datasource.username = usermicros
+      - quarkus.datasource.password = pswmicros
+  dependencies:
+    - camel:jdbc
+    - mvn:io.quarkus:quarkus-jdbc-postgresql
+
+
+
+---
+apiVersion: camel.apache.org/v1
+kind: Kamelet
+metadata:
+  annotations:
+    camel.apache.org/operator.id: camel-k
+    camel.apache.org/kit.registry: host.docker.internal:5000
+  labels:
+    app: camel-k
+  name: events-source
+  namespace: camel-k
+spec:
+  definition:
+    description: Produces periodic events with a custom payload
+    properties:
+      message:
+        description: The message to generate
+        title: Message
+        type: string
+      period:
+        default: 1000
+        description: The time interval between two events
+        title: Period
+        type: integer
+    required:
+      - message
+    title: Example Timer
+  template:
+    from:
+      parameters:
+        period: '#property:period'
+      steps:
+        - setBody:
+            constant: '#property:message'
+        - to: 'kamelet:sink'
+      uri: 'timer:tick'
+
+
+
+
+#& FUNCIONANDO LOG-INTEGRATION (LOG)
+---
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  annotations:
+    camel.apache.org/operator.id: camel-k
+  name: log-integration
+  namespace: camel-k
+spec:
+  # integrationKit: camel-kit
+  flows:
+  - from:
+      parameters:
+        period: "1000"
+      steps:
+      - setBody:
+          simple: Hello Camel from ${routeId}
+      - log: ${body}
+      uri: timer:yaml
+
+
+
+---
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  creationTimestamp: null
+  name: javalog
+  namespace: camel-k
+spec:
+  sources:
+  - content: |
+      import org.apache.camel.builder.RouteBuilder;
+      public class Sample extends RouteBuilder {
+        @Override
+        public void configure()
+        throws Exception {
+          from("timer:tick?period=5000")
+            .setBody().constant("Hello world from Camel K")
+            .to("log:info");
+            //.log("**********************Hello Integration*************************!");
+        }
+      }
+    name: Sample.java
+status: {}
+

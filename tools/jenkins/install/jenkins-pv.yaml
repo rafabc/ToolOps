@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+#  - Read-Write-Many
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: jenkins-sc
+  #Máquina del disco remoto.
+  nfs:
+    path: /var/lib/nfs/jenkins
+    server: gitserver.gfilab.es
+  #Maquina local
+#  local:
+#    path: /data/jenkins-volume/
+#    path: /mnt/local-storage/kafka/broker
+#    path: /var/lib/nfs/jenkins
+#  nodeAffinity:
+#    required:
+#      nodeSelectorTerms:
+#      - matchExpressions:
+#        - key: kubernetes.io/hostname
+#          operator: In
+#          values:
+#          - ocpworker01.gfilab.es

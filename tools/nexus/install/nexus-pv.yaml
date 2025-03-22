@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sonatype-nexus-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+#  - Read-Write-Many
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: sonatype-nexus-sc
+  #Máquina del disco remoto.
+  nfs:
+    path: /var/lib/nfs/nexus
+    server: gitserver.gfilab.es

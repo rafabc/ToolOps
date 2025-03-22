@@ -1,0 +1,19 @@
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  name: dbtoredis
+  namespace: camel-k
+spec:
+  sources:
+    - name: mi-fuente
+      content: |
+        from("timer:tick?period=5000")
+          .setBody().constant("Hello from Camel-K")
+          .to("log:info")
+  integrationKit:
+    registry:
+      url: "https://host.docker.internal:5000"
+  dependencies:
+    - groupId: org.postgresql
+      artifactId: postgresql
+      version: 42.2.19

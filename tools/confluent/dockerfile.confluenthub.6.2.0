@@ -1,0 +1,6 @@
+FROM confluentinc/cp-kafka-connect-base
+
+RUN confluent-hub install --no-prompt microsoft/kafka-connect-iothub:latest \
+    && confluent-hub install --no-prompt wepay/kafka-connect-bigquery:latest \
+    && confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:10.6.0 \
+    && confluent-hub install --no-prompt fbascheper/kafka-connect-telegram:0.2.0

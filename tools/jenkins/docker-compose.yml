@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins    
+    privileged: true
+    user: root
+    ports:
+      - 8090:8080
+#      - 50000:50000
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '0.25'
+    #       memory: 4000M
+    #     reservations:
+    #       cpus: '0.25'
+    #       memory: 4000M    
+    volumes:
+      - './data:/var/jenkins_home'
+      # - ~/jenkins:/var/jenkins_home
+      # - /var/run/docker.sock:/var/run/docker.sock
+      # - /usr/local/bin/docker:/usr/local/bin/docker
+
+    networks:
+      - confluent_default
+
+networks:
+  confluent_default:
+    external: true      
+
+# networks:
+#   default:
+#     driver: host
+#     external: true

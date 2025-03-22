@@ -1,0 +1,33 @@
+version: "3.6"
+
+services:
+    web:
+      image: 'gitlab/gitlab-ce:15.6.0-ce.0'
+      restart: always
+      hostname: 'campeat.dev'
+      container_name: gitlab
+      environment:
+        GITLAB_OMNIBUS_CONFIG: |
+          external_url 'http://campeat.dev'
+      ports:
+        - '8083:80'
+        - '2223:22'
+      volumes:
+        - './tools/gitlab/config:/etc/gitlab'
+        - './tools/gitlab/logs:/var/log/gitlab'
+        - './tools/gitlab/data:/var/opt/gitlab'
+      shm_size: '256m'
+    gitlab-runner:
+      image: 'gitlab/gitlab-runner:alpine3.15-bleeding'
+      restart: always
+      hostname: 'campeat.dev'  
+      container_name: gitlab-runner   
+      depends_on:
+        - web
+# volumes:
+#     gitlab-data:
+#         external: true
+
+
+
+#gitlab token: glpat-Wxxzo8HAzsFtzq9C1syB

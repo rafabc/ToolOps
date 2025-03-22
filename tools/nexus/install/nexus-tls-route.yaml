@@ -1,0 +1,32 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: sonatype-nexus-tls
+  namespace: nexus
+spec:
+  host: nexus-tls-nexus.apps.gfilab.es
+  port:
+    #targetPort: http
+    targetPort: sonatype-nexus
+  to:
+    kind: Service
+    name: sonatype-nexus
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+#    key: |-
+#      -----BEGIN PRIVATE KEY-----
+#      [...]
+#      -----END PRIVATE KEY-----
+#    certificate: |-
+#      -----BEGIN CERTIFICATE-----
+#      [...]
+#      -----END CERTIFICATE-----
+#    caCertificate: |-
+#      -----BEGIN CERTIFICATE-----
+#      [...]
+#      -----END CERTIFICATE-----
+#    destinationCACertificate: |-
+#      -----BEGIN CERTIFICATE-----
+#      [...]
+#      -----END CERTIFICATE-----

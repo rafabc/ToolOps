@@ -1,0 +1,9 @@
+version: "3.6"
+
+services:
+    web:
+      image: 'redislabs/redisinsight:1.14.0'
+      restart: always
+      container_name: redisinsight
+      ports:
+        - '8001:8001'

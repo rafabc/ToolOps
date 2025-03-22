@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
+FIXED_LENGTH=50
+
 function launch_menu_platform() {
     clear
     msg_task "Select destination platform"
     printf "\n%s$GREEN_BOLD%s"
-    OPT1="%s$GREEN_BOLD%s %2s %s$ARROW%s DOCKER COMPOSE %6s"
-    OPT2="%s$GREEN_BOLD%s %2s %s$ARROW%s KUBERNETES ON PREMISES  %7s"
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DOCKER COMPOSE")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KUBERNETES ON PREMISES")
+    
+    # OPT2="%s$GREEN_BOLD%s %2s %s$ARROW%s KUBERNETES ON PREMISES  %29s"
 
     options=("$OPT1" "$OPT2")
     select_option "${options[@]}"
@@ -21,18 +25,28 @@ function launch_menu_platform() {
 function launch_menu_compose_tools() {
 
     clear
-    msg_task "Select product to interact"
+    msg_task "Select product to deploy with docker compose"
     printf "\n%s$GREEN_BOLD%s"
-    OPT1="%s$GREEN_BOLD%s %2s %s$ARROW%s CONFLUENT   "
-    OPT2="%s$GREEN_BOLD%s %2s %s$ARROW%s JENKINS          "
-    OPT3="%s$GREEN_BOLD%s %2s %s$ARROW%s GITLAB            "
-    OPT4="%s$GREEN_BOLD%s %2s %s$ARROW%s WSO2       "
-    OPT5="%s$GREEN_BOLD%s %2s %s$ARROW%s NEXUS     "
-    OPT6="%s$GREEN_BOLD%s %2s %s$ARROW%s MAILHOG     "
-    OPT7="%s$GREEN_BOLD%s %2s %s$ARROW%s REDIS     "
-    OPT8="%s$GREEN_BOLD%s %2s %s$ARROW%s FLINK     "
-    OPT9="%s$GREEN_BOLD%s %2s %s$ARROW%s PROMETHEUS     "
-    OPT10="%s$GREEN_BOLD%s %2s %s$ARROW%s KLAW     "
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  CONFLUENT")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  JENKINS")
+    OPT3=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  GITLAB")
+    OPT4=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  WSO2")
+    OPT5=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  NEXUS")
+    OPT6=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  MAILHOG")
+    OPT7=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  REDIS")
+    OPT8=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  FLINK")
+    OPT9=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  PROMETHEUS")
+    OPT10=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KLAW")
+
+    # OPT2="%s$GREEN_BOLD%s %2s %s$ARROW%s JENKINS          "
+    # OPT3="%s$GREEN_BOLD%s %2s %s$ARROW%s GITLAB            "
+    # OPT4="%s$GREEN_BOLD%s %2s %s$ARROW%s WSO2       "
+    # OPT5="%s$GREEN_BOLD%s %2s %s$ARROW%s NEXUS     "
+    # OPT6="%s$GREEN_BOLD%s %2s %s$ARROW%s MAILHOG     "
+    # OPT7="%s$GREEN_BOLD%s %2s %s$ARROW%s REDIS     "
+    # OPT8="%s$GREEN_BOLD%s %2s %s$ARROW%s FLINK     "
+    # OPT9="%s$GREEN_BOLD%s %2s %s$ARROW%s PROMETHEUS     "
+    # OPT10="%s$GREEN_BOLD%s %2s %s$ARROW%s KLAW     "
 
     options=("$OPT1" "$OPT2" "$OPT3" "$OPT4" "$OPT5" "$OPT6" "$OPT7" "$OPT8" "$OPT9" "$OPT10")
     select_option "${options[@]}"
@@ -49,9 +63,9 @@ function launch_menu_cloud() {
     clear
     msg_task "Select kubernetes action"
     printf "\n%s$GREEN_BOLD%s"
-    OPT1="%s$GREEN_BOLD%s %2s %s$ARROW%s AWS     "
-    OPT2="%s$GREEN_BOLD%s %2s %s$ARROW%s AZURE     "
-    OPT3="%s$GREEN_BOLD%s %2s %s$ARROW%s GCP     "
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  AWS")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  AZURE")
+    OPT3=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  GCP")
 
     options=("$OPT1" "$OPT2" "$OPT3")
     select_option "${options[@]}"
@@ -67,9 +81,9 @@ function launch_menu_aws_tools() {
     clear
     msg_task "Select kubernetes action"
     printf "\n%s$GREEN_BOLD%s"
-    OPT1="%s$GREEN_BOLD%s %2s %s$ARROW%s DYNAMODB     "
-    OPT2="%s$GREEN_BOLD%s %2s %s$ARROW%s SQS     "
 
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DYNAMODB")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  SQS")
 
     options=("$OPT1" "$OPT2")
     select_option "${options[@]}"
@@ -85,13 +99,13 @@ function launch_menu_tool_actions() {
     clear
     msg_task "Select product action"
     printf "\n%s$CYAN_BOLD%s"
-    OPT1="%s$CYAN_BOLD%s %2s %s$ARROW%s BUILD & UP    "
-    OPT2="%s$CYAN_BOLD%s %2s %s$ARROW%s START                   "
-    OPT3="%s$CYAN_BOLD%s %2s %s$ARROW%s STOP               "
-    OPT4="%s$CYAN_BOLD%s %2s %s$ARROW%s RESTART                  "
-    OPT5="%s$CYAN_BOLD%s %2s %s$ARROW%s DOWN     "
-    OPT6="%s$CYAN_BOLD%s %2s %s$ARROW%s DELETE     "
-    OPT7="%s$CYAN_BOLD%s %2s %s$ARROW%s RUN SERVICE     "
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  BUILD & UP")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  START")
+    OPT3=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  STOP")
+    OPT4=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  RESTART")
+    OPT5=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DOWN")
+    OPT6=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DELETE")
+    OPT7=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  RUN SERVICE")
 
     options=("$OPT1" "$OPT2" "$OPT3" "$OPT4" "$OPT5" "$OPT6" "$OPT7")
     select_option "${options[@]}"
@@ -108,18 +122,18 @@ function launch_menu_kube_tools() {
     clear
     msg_task "Select kubernetes action"
     printf "\n%s$GREEN_BOLD%s"
-    OPT1="%s$GREEN_BOLD%s %2s %s$ARROW%s ---- FREE PLACEHOLDER ----     "
-    OPT2="%s$GREEN_BOLD%s %2s %s$ARROW%s KUBERNETES DASHOBOARD     "
-    OPT3="%s$GREEN_BOLD%s %2s %s$ARROW%s CAMEL K     "
-    OPT4="%s$GREEN_BOLD%s %2s %s$ARROW%s REDIS     "
-    OPT5="%s$GREEN_BOLD%s %2s %s$ARROW%s LINKERD     "
-    OPT6="%s$GREEN_BOLD%s %2s %s$ARROW%s KEYCLOAK     "
-    OPT7="%s$GREEN_BOLD%s %2s %s$ARROW%s CONFLUENT     "
-    OPT8="%s$GREEN_BOLD%s %2s %s$ARROW%s KLAW     "
-    OPT9="%s$GREEN_BOLD%s %2s %s$ARROW%s KARAVAN     "
-    OPT10="%s$GREEN_BOLD%s %2s %s$ARROW%s SOLACE     "
-    OPT11="%s$GREEN_BOLD%s %2s %s$ARROW%s N8N     "
-    OPT12="%s$GREEN_BOLD%s %2s %s$ARROW%s ISTIO     "
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  FREE PLACE")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KUBERNETES DASHOBOARD")
+    OPT3=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  CAMEL K")
+    OPT4=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  REDIS")
+    OPT5=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  LINKERD")
+    OPT6=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KEYCLOAK")
+    OPT7=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  CONFLUENT")
+    OPT8=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KLAW")
+    OPT9=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KARAVAN")
+    OPT10=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  SOLACE")
+    OPT11=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  N8N")
+    OPT12=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  ISTIO")
 
     options=("$OPT1" "$OPT2" "$OPT3" "$OPT4" "$OPT5" "$OPT6" "$OPT7" "$OPT8" "$OPT9" "$OPT10" "$OPT11" "$OPT12")
     select_option "${options[@]}"
@@ -135,13 +149,14 @@ function launch_menu_kube_actions() {
     clear
     msg_task "Select product action"
     printf "\n%s$CYAN_BOLD%s"
-    OPT1="%s$CYAN_BOLD%s %2s %s$ARROW%s APPLAY    "
-    OPT2="%s$CYAN_BOLD%s %2s %s$ARROW%s DELETE                   "
-    OPT3="%s$CYAN_BOLD%s %2s %s$ARROW%s CHECK STATUS               "
-    # OPT4="%s$CYAN_BOLD%s %2s %s$ARROW%s RESTART                  "
-    # OPT5="%s$CYAN_BOLD%s %2s %s$ARROW%s DOWN     "
-    # OPT6="%s$CYAN_BOLD%s %2s %s$ARROW%s DELETE     "
-    # OPT7="%s$CYAN_BOLD%s %2s %s$ARROW%s RUN SERVICE     "
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  APPLAY")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DELETE")
+    OPT3=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  CHECK STATUS")
+    # OPT4=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  RESTART")
+    # OPT5=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DOWN")
+    # OPT6=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DELETE")
+    # OPT7=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  RUN SERVICE")
+
 
     options=("$OPT1" "$OPT2" "$OPT3")
     select_option "${options[@]}"
@@ -156,11 +171,12 @@ function launch_menu_semver_version() {
     clear
     msg_task "Select semver action to start build"
     printf "\n%s$BLUE_BOLD%s"
-    OPT1="%s$BLUE_BOLD%s %2s %s$ARROW%s PATCH (parche)                  %16s"
-    OPT2="%s$BLUE_BOLD%s %2s %s$ARROW%s MINOR (minor version)           %17s"
-    OPT3="%s$BLUE_BOLD%s %2s %s$ARROW%s MAJOR (major version)           %17s"
-    OPT4="%s$BLUE_BOLD%s %2s %s$ARROW%s RELEASE (release version)       %18s"
-    OPT5="%s$BLUE_BOLD%s %2s %s$ARROW%s PREREL (same actual version)    %18s"
+
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  PATCH (parche)")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  MINOR (minor version)")
+    OPT3=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  MAJOR (major version)")
+    OPT4=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  RELEASE (release version)")
+    OPT5=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  PREREL (same actual version)")
 
     options=("$OPT1" "$OPT2" "$OPT3" "$OPT4" "$OPT5")
     select_option "${options[@]}"

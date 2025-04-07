@@ -48,7 +48,7 @@ spec:
         - name: "KARAVAN_CAMEL_STATUS_INTERVAL"
           value: "3s"
         - name: "KARAVAN_DEVMODE_IMAGE"
-          value: "ghcr.io/apache/camel-karavan-devmode:4.5.1"
+          value: "ghcr.io/apache/camel-karavan-devmode:4.10.2"
         - name: "karavan.git.repository"
           valueFrom:
             secretKeyRef:
@@ -99,7 +99,7 @@ spec:
             fieldRef:
               apiVersion: ""
               fieldPath: "metadata.namespace"
-        image: "ghcr.io/apache/camel-karavan:4.5.1"
+        image: "ghcr.io/apache/camel-karavan:4.10.2"
         imagePullPolicy: "Always"
         name: "karavan"
         ports:
@@ -118,7 +118,7 @@ commonLabels:
   app: "karavan"
   app.kubernetes.io/part-of: "karavan"
   app.kubernetes.io/name: "karavan"
-  app.kubernetes.io/version: "4.5.1"
+  app.kubernetes.io/version: "4.10.2"
 namespace: "karavan"
 resources:
   - secret.yaml
@@ -196,7 +196,7 @@ metadata:
   name: "karavan"
 rules:
 - apiGroups: [""]
-  resources: ["secrets", "configmaps", "serviceaccounts"]
+  resources: ["secrets", "configmaps", "serviceaccounts", "namespaces"]
   verbs: ["*"]
 - apiGroups: [""]
   resources: ["persistentvolumes", "persistentvolumeclaims"]

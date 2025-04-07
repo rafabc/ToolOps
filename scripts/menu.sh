@@ -122,8 +122,8 @@ function launch_menu_kube_tools() {
     clear
     msg_task "Select tool to deploy in kubernetes"
     printf "\n%s$GREEN_BOLD%s"
-    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  FREE PLACE")
-    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KUBERNETES DASHOBOARD")
+    OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KUBERNETES DASHOBOARD")
+    OPT2=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  ACTIVE MQ (ARTEMIS)")
     OPT3=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  CAMEL K")
     OPT4=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  REDIS")
     OPT5=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  LINKERD")

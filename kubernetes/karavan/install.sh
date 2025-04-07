@@ -8,7 +8,7 @@ function install_karavan() {
 
     apply_resources "karavan.yml"
 
-    sleep 5 & spinner $! "Waiting pod running"
+    wait_pod_running "karavan"
 
     port_forward "8899" "80" karavan
 

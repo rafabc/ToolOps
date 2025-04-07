@@ -18,7 +18,7 @@ function create_namespace() {
         msg_warn "Namespace $NAMESPACE no existe - se procede a su creacion"
         msg "Applying $NAMESPACE namespace"
 
-       if [ ! -f namespace.yml ]; then
+        if [ ! -f namespace.yml ]; then
             msg_warn "El fichero namespace.yml no existe"
             return 1
         fi
@@ -38,7 +38,6 @@ function create_namespace() {
     fi
 
 }
-
 
 function delete_namespace() {
 
@@ -141,16 +140,14 @@ function kube_apply() {
     fi
 
     case "$TOOL" in
-    0) # ************************* FREE PLACE ******************************
-        ./apply.sh
-        sleep 3
-        ./port-forward-db.sh
-        ;;
-    1) # ************************* KUBERNETES DASHBOARD **************************
+    0) # ************************* KUBERNETES DASHBOARD ******************************
         kubectl apply -f *
         sleep 3
         kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard 9090:9090 &
         disown
+        ;;
+    1) # ************************* ACTIVE MQ **************************
+        install_activemq
         ;;
     2) # ****************************** CAMEL K ***********************************
         install_camelk
@@ -191,22 +188,23 @@ function kube_apply() {
 function kube_delete() {
     TOOL=$1
     case "$TOOL" in
-    0) # ************************* FREEE PLACE ******************************
-        echo
+    0)
+        # ************************* KUBERNETES DASHBOARD ******************************
         kubectl delete -f *
         ;;
-    1) # ************************* KUBERNETES DASHBOARD **************************
-        echo
-        kubectl delete -f *
+    1)
+        # ************************* ACTIVE MQ **************************
+        uninstall_activemq
         ;;
-    2) # ****************************** CAMEL K ***********************************
+    2)
+        # ****************************** CAMEL K ***********************************
         uninstall_camelk
         ;;
-    3) # ****************************** REDIS ******************************
+    3)
+        # ****************************** REDIS ******************************
         uninstall_redis
         ;;
     4)
-
         uninstall_emojivoto
         uninstall_linkerd_viz
         uninstall_linkerd
@@ -239,11 +237,9 @@ function kube_delete() {
         uninstall_solace
         ;;
     10) # ******************************** N8N *******************************
-        echo "n8n"
         uninstall_n8n
         ;;
     11) # ****************************** ISTIO *******************************
-        echo "Istio"
         uninstall_istio
         ;;
     esac
@@ -262,9 +258,6 @@ function kube_check() {
 
     case "$TOOL" in
     0)
-        kubectl ****
-        ;;
-    1)
         msg "Check Kubernetes Dashboard status"
         DASHBOARD_POD=$(kubectl get pods -n kubernetes-dashboard -l k8s-app=kubernetes-dashboard -o jsonpath='{.items[0].metadata.name}')
         STATUS=$(kubectl get pod $DASHBOARD_POD -n kubernetes-dashboard -o jsonpath='{.status.phase}')
@@ -272,6 +265,16 @@ function kube_check() {
             msg_check_success "POD Kubernetes Dashboard $DASHBOARD_POD Status: $STATUS"
         else
             msg_check_fail "POD Kubernetes Dashboard $DASHBOARD_POD Status: $STATUS"
+        fi
+        ;;
+    1)
+        msg "Check ActiveMQ status"
+        ACTIVEMQ_POD=$(kubectl get pods -n activemq -l app=activemq -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kubectl get pod $ACTIVEMQ_POD -n activemq -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD ActiveMQ $ACTIVEMQ_POD Status: $STATUS"
+        else
+            msg_check_fail "POD ActiveMQ $ACTIVEMQ_POD Status: $STATUS"
         fi
         ;;
     2)
@@ -362,7 +365,6 @@ function kube_check() {
     esac
 }
 
-
 function apply_resources() {
     RESOURCES_FILE=$1
     msg "EXEC KUBECTL APPLY" "$RESOURCES_FILE"
@@ -374,9 +376,77 @@ function apply_resources() {
     fi
 }
 
+function delete_resources() {
+    RESOURCES=$1
+    msg "DELETEING RESOURCES" "$RESOURCES"
+
+    echo
+    if [ "$VERBOSE" -eq 1 ]; then
+        msg "CLUSTER ROLES"
+        kubectl get clusterroles -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" 
+        kubectl get clusterroles -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete clusterrole
+
+        msg "CLUSTER ROLE BINDINGS"
+        kubectl get clusterrolebindings -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get clusterrolebindings -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete clusterrolebinding
+
+        msg "ROLE BINDINGS"
+        kubectl get rolebindings -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get rolebindings -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete rolebinding
+
+        msg "CRON JOBS"
+        kubectl get cj -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" 
+        kubectl get cj -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete cj
+
+        msg "SERVICE ACCOUNTS"
+        kubectl get serviceaccounts -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get serviceaccounts -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete serviceaccounts
+
+        msg "DEPLOYMENTS"
+        kubectl get deployments -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get deployments -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete deployments
+
+        msg "REPLICA SETS"
+        kubectl get rs -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get rs -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete rs
+
+        msg "CONFIG MAPS"
+        kubectl get cm -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get cm -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete cm
+
+        msg "SECRETS"
+        kubectl get secrets -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get secrets -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete secrets
+
+        msg "SERVICES"
+        kubectl get svc -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get svc -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete svc
+
+        msg "PODS"
+        kubectl get pods -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES"
+        kubectl get pods -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete pods
+
+
+        kubectl delete -f $RESOURCES &>/dev/null
+    else
+        kubectl get clusterroles -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete clusterrole
+        kubectl get clusterrolebindings -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete clusterrolebinding
+        kubectl get rolebindings -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete rolebinding
+        kubectl get cj -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete cj
+        kubectl get serviceaccounts -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete serviceaccounts
+        kubectl get deployments -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete deployments
+        kubectl get rs -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete rs
+        kubectl get cm -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete cm
+        kubectl get secrets -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete secrets
+        kubectl get svc -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete svc
+        kubectl get pods -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$RESOURCES" | xargs kubectl delete pods
+        kubectl delete -f $RESOURCES
+    fi
+
+}
 
 function port_forward() {
-    
+
     PORT_FORWARD=$1
     PORT=$2
     SERVICE=$3
@@ -390,7 +460,7 @@ function port_forward() {
     else
         lsof -i tcp:$PORT_FORWARD
     fi
-    
+
     if [ $? -eq 0 ]; then
         msg_info "PID_PORT $PID_PORT de $SERVICE localizado, se procede a matarlo"
         kill -9 $PID_PORT
@@ -400,8 +470,19 @@ function port_forward() {
 
     echo
     if [ "$VERBOSE" -eq 0 ]; then
-        kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT & disown &>/dev/null
+        kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT &
+        disown &>/dev/null
     else
-        kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT & disown
+        kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT &
+        disown
     fi
+}
+
+function wait_pod_running() {
+    POD_NAME=$1
+    msg "WAITING POD RUNNING" "$POD"
+    POD=$(kubectl get pods -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$POD_NAME")
+    kubectl get pod $POD
+    kubectl wait --for=condition=ContainersReady pod/$POD --timeout=3m &
+    spinner $! "Waiting for condition container ready"
 }

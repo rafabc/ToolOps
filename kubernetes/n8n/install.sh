@@ -9,9 +9,7 @@ function install_n8n() {
 
     apply_resources "n8n.yml"
 
-    POD=$(kubectl get pods -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep '^n8n')
-    kubectl get pod $POD
-    kubectl wait --for=condition=ContainersReady pod/$POD --timeout=3m & spinner $! "Waiting for condition container ready"
+    wait_pod_running "n8n"
 
     port_forward "5678" "5678" n8n
 

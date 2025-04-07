@@ -13,6 +13,8 @@ function install_keycloak() {
 
 	apply_resources "keycloak.yml"
 
+	wait_pod_running "keycloak"
+
 	port_forward "8765" "8080" keycloak
 
 }

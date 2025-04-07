@@ -16,6 +16,9 @@ source ./scripts/builders/build-tool.sh
 source ./scripts/kubernetes.sh
 source ./scripts/spinner.sh
 
+source ./kubernetes/activemq/install.sh
+source ./kubernetes/activemq/uninstall.sh
+
 source ./kubernetes/linkerd/install.sh
 source ./kubernetes/linkerd/uninstall.sh
 
@@ -147,12 +150,12 @@ function execute_kube_tool_action() {
 
     case "$tool_selected" in
     0)
-        cd kubernetes/s-----
-        msg "TOOL SELECTED" "FREE PLACE" "WITH ACTION $action_selected IN tool $tool_selected"
-        ;;
-    1)
         cd kubernetes/dashboard
         msg "TOOL SELECTED" "KUBERNETES DASHBOARD" "WITH ACTION $action_selected IN tool $tool_selected"
+        ;;
+    1)
+        cd kubernetes/activemq
+        msg "TOOL SELECTED" "ACTIVE MQ (ARTEMIS)" "WITH ACTION $action_selected IN tool $tool_selected"
         ;;
     2)
         cd kubernetes/camelk

@@ -3,5 +3,5 @@
 ../node_modules
 node_modules
 logs
-./tools/.DS_Store
+./compose/.DS_Store
 ToolOps.code-workspace

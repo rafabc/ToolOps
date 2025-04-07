@@ -1,0 +1,68 @@
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: active-mq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: active-mq
+  template:
+    metadata:
+      labels:
+        app: active-mq
+    spec:
+      containers:
+        - name: active-mq
+          image: apache/activemq-artemis:latest
+        #  imagePullPolicy: Always
+        # resources:
+        #   requests:
+        #     memory: 500Mi
+        #     cpu: 200m
+        #   limits:
+        #     memory: 1000Mi
+        #     cpu: 400m
+    # volumes:
+    # - name: active-creds
+    #   secret:
+    #     secretName: creds
+    # restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: active-mq
+  namespace: active-mq
+  labels:
+    app: active-mq
+spec:
+  selector:
+    app: active-mq
+  ports:
+    - name: dashboard
+      port: 8161
+      targetPort: 8161
+      protocol: TCP
+    - name: openwire
+      port: 61616
+      targetPort: 61616
+      protocol: TCP
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+      protocol: TCP
+    - name: stomp
+      port: 61613
+      targetPort: 61613
+      protocol: TCP
+    - name: mqtt
+      port: 1883
+      targetPort: 1883
+      protocol: TCP
+  type: LoadBalancer

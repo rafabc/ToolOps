@@ -9,7 +9,7 @@ public class DatabaseToRedisRoute extends RouteBuilder {
     public BasicDataSource createDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://sb-db-svc:5432/<<dbname>>");
+        dataSource.setUrl("jdbc:postgresql://-svc:5432/<<dbname>>");
         dataSource.setUsername("usermicros");
         dataSource.setPassword("pswmicros");
         return dataSource;

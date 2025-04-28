@@ -87,7 +87,7 @@ function docker_push() {
 
 
 function docker_create_network() {
-    docker network create -d bridge sb-network
+    docker network create -d bridge docker-network
 }
 
 

@@ -19,7 +19,7 @@ function create_namespace() {
         msg "Applying $NAMESPACE namespace"
 
         if [ ! -f namespace.yml ]; then
-            msg_warn "El fichero namespace.yml no existe"
+            msg_warn "El fichero namespace.yml no existe en $PWD"
             return 1
         fi
 
@@ -181,6 +181,9 @@ function kube_apply() {
         #install_istio
         install_istio_with_helm
         ;;
+    12) # ******************************* EVENT CATALOG ************************
+        install_event_catalog_helm
+        ;;
     esac
 
 }
@@ -241,6 +244,9 @@ function kube_delete() {
         ;;
     11) # ****************************** ISTIO *******************************
         uninstall_istio
+        ;;
+    12) # ****************************** EVENT CATALOG ************************
+        uninstall_event_catalog
         ;;
     esac
 }

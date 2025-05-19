@@ -49,6 +49,10 @@ source ./kubernetes/n8n/uninstall.sh
 source ./kubernetes/istio/install.sh
 source ./kubernetes/istio/uninstall.sh
 
+source ./kubernetes/eventcatalog/install.sh
+source ./kubernetes/eventcatalog/uninstall.sh
+
+
 
 
 if [[ "$1" == "-v" ]]; then
@@ -196,6 +200,10 @@ function execute_kube_tool_action() {
     11)
         cd kubernetes/istio
         msg "TOOL SELECTED" "ISTIO" "WITH ACTION $action_selected IN tool $tool_selected"
+        ;;
+    12)
+        cd kubernetes/eventcatalog
+        msg "TOOL SELECTED" "EVENT CATALOG" "WITH ACTION $action_selected IN tool $tool_selected"
         ;;
     esac
 }

@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: llama3
+    ports:
+      - "11434:11434"
+    # volumes:
+    #   - ollama:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama:

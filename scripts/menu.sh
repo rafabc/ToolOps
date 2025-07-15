@@ -37,18 +37,14 @@ function launch_menu_compose_tools() {
     OPT8=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  FLINK")
     OPT9=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  PROMETHEUS")
     OPT10=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KLAW")
+    OPT11=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  AKHQ")
+    OPT12=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KLOW")
+    OPT13=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KAOTO")
+    OPT14=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KARAVAN")
+    OPT15=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  ATLASMAP")
 
-    # OPT2="%s$GREEN_BOLD%s %2s %s$ARROW%s JENKINS          "
-    # OPT3="%s$GREEN_BOLD%s %2s %s$ARROW%s GITLAB            "
-    # OPT4="%s$GREEN_BOLD%s %2s %s$ARROW%s WSO2       "
-    # OPT5="%s$GREEN_BOLD%s %2s %s$ARROW%s NEXUS     "
-    # OPT6="%s$GREEN_BOLD%s %2s %s$ARROW%s MAILHOG     "
-    # OPT7="%s$GREEN_BOLD%s %2s %s$ARROW%s REDIS     "
-    # OPT8="%s$GREEN_BOLD%s %2s %s$ARROW%s FLINK     "
-    # OPT9="%s$GREEN_BOLD%s %2s %s$ARROW%s PROMETHEUS     "
-    # OPT10="%s$GREEN_BOLD%s %2s %s$ARROW%s KLAW     "
 
-    options=("$OPT1" "$OPT2" "$OPT3" "$OPT4" "$OPT5" "$OPT6" "$OPT7" "$OPT8" "$OPT9" "$OPT10")
+    options=("$OPT1" "$OPT2" "$OPT3" "$OPT4" "$OPT5" "$OPT6" "$OPT7" "$OPT8" "$OPT9" "$OPT10" "$OPT11" "$OPT12" "$OPT13" "$OPT14" "$OPT15")
     select_option "${options[@]}"
     choice=$?
     printf "%s$RESET%s\n"

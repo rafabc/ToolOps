@@ -111,6 +111,8 @@ function delete_namespace() {
 
     msg_info_idented "namespace killed"
     # proxy will get killed by the trap
+
+    kubectl delete namespace $NAMESPACE &>/dev/null
 }
 
 function exec_kube_action() {

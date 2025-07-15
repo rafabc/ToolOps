@@ -12,9 +12,9 @@ stringData:
   karavan.keycloak.frontend.clientId: "karavan"
   karavan.keycloak.backend.clientId: "karavan"
   karavan.keycloak.backend.secret: "secret"
-  karavan.git.repository: "https://xxxxx@dev.azure.com/xxxxx/DEMOS/_git/karavan-samples"
-  karavan.git.username: "rafael.blanco"
-  karavan.git.password: "*********"
+  karavan.git.repository: "https://github.com/rafabc/karavan-repository"
+  karavan.git.username: "rafabc"
+  karavan.git.password: "123123"
   karavan.git.branch: "main"
   karavan.container-image.registry: "registry:5000"
   karavan.container-image.group: "karavan"
@@ -38,76 +38,77 @@ spec:
         app: "karavan"
     spec:
       containers:
-      - env:
-        - name: "KARAVAN_ENVIRONMENT"
-          value: "dev"
-        - name: "KARAVAN_CONTAINER_STATUS_INTERVAL"
-          value: "disabled"
-        - name: "KARAVAN_CONTAINER_STATISTICS_INTERVAL"
-          value: "disabled"
-        - name: "KARAVAN_CAMEL_STATUS_INTERVAL"
-          value: "3s"
-        - name: "KARAVAN_DEVMODE_IMAGE"
-          value: "ghcr.io/apache/camel-karavan-devmode:4.10.2"
-        - name: "karavan.git.repository"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.git.repository"
+        - name: "karavan"
+          image: "ghcr.io/apache/camel-karavan:4.8.3"
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 8080
               name: "karavan"
-        - name: "karavan.git.username"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.git.username"
-              name: "karavan"
-        - name: "karavan.git.password"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.git.password"
-              name: "karavan"
-        - name: "karavan.git.branch"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.git.branch"
-              name: "karavan"
-        - name: "karavan.keycloak.url"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.keycloak.url"
-              name: "karavan"
-        - name: "karavan.keycloak.realm"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.keycloak.realm"
-              name: "karavan"
-        - name: "karavan.keycloak.frontend.clientId"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.keycloak.frontend.clientId"
-              name: "karavan"
-        - name: "karavan.keycloak.backend.clientId"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.keycloak.backend.clientId"
-              name: "karavan"
-        - name: "karavan.keycloak.backend.secret"
-          valueFrom:
-            secretKeyRef:
-              key: "karavan.keycloak.backend.secret"
-              name: "karavan"
-        - name: "KUBERNETES_NAMESPACE"
-          valueFrom:
-            fieldRef:
-              apiVersion: ""
-              fieldPath: "metadata.namespace"
-        image: "ghcr.io/apache/camel-karavan:4.10.2"
-        imagePullPolicy: "Always"
-        name: "karavan"
-        ports:
-        - containerPort: 8080
-          name: "karavan"
-        resources:
-          requests:
-            memory: "1024Mi"
+          resources:
+            requests:
+              memory: "1024Mi"
+          env:
+            - name: "KARAVAN_ENVIRONMENT"
+              value: "dev"
+            - name: "KARAVAN_CONTAINER_STATUS_INTERVAL"
+              value: "disabled"
+            - name: "KARAVAN_CONTAINER_STATISTICS_INTERVAL"
+              value: "disabled"
+            - name: "KARAVAN_CAMEL_STATUS_INTERVAL"
+              value: "3s"
+            - name: "KARAVAN_DEVMODE_IMAGE"
+              value: "ghcr.io/apache/camel-karavan-devmode:4.8.3"
+            - name: "karavan.git.repository"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.git.repository"
+                  name: "karavan"
+            - name: "karavan.git.username"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.git.username"
+                  name: "karavan"
+            - name: "karavan.git.password"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.git.password"
+                  name: "karavan"
+            - name: "karavan.git.branch"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.git.branch"
+                  name: "karavan"
+            - name: "karavan.keycloak.url"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.keycloak.url"
+                  name: "karavan"
+            - name: "karavan.keycloak.realm"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.keycloak.realm"
+                  name: "karavan"
+            - name: "karavan.keycloak.frontend.clientId"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.keycloak.frontend.clientId"
+                  name: "karavan"
+            - name: "karavan.keycloak.backend.clientId"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.keycloak.backend.clientId"
+                  name: "karavan"
+            - name: "karavan.keycloak.backend.secret"
+              valueFrom:
+                secretKeyRef:
+                  key: "karavan.keycloak.backend.secret"
+                  name: "karavan"
+            - name: "KUBERNETES_NAMESPACE"
+              valueFrom:
+                fieldRef:
+                  apiVersion: ""
+                  fieldPath: "metadata.namespace"
+
       serviceAccount: "karavan"
 
 
@@ -118,7 +119,7 @@ commonLabels:
   app: "karavan"
   app.kubernetes.io/part-of: "karavan"
   app.kubernetes.io/name: "karavan"
-  app.kubernetes.io/version: "4.10.2"
+  app.kubernetes.io/version: "4.8.3"
 namespace: "karavan"
 resources:
   - secret.yaml

@@ -1,0 +1,16 @@
+services:
+  kowl:
+    image: rsmnarts/kowl:latest
+    restart: unless-stopped
+    container_name: kowl
+    hostname: kowl
+    environment:
+      KAFKA_BROKERS: "broker:29092"
+    ports:
+      - "8099:8080"
+    networks:
+      - confluent_default  
+      
+networks:
+  confluent_default:
+    external: true      

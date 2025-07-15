@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "solace": "^1.2.0",
+    "solclientjs": "^10.18.2"
+  }
+}

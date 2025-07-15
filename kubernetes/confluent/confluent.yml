@@ -72,13 +72,24 @@ spec:
     connect:
     - name: connect
       url: http://connect.confluent.svc.cluster.local:8083
+  configOverrides:
+      server:
+        - confluent.controlcenter.internal.topics.replication=1
+        - confluent.metrics.topic.replication=1
+        - confluent.metrics.topic.min.isr=1
+        - confluent.controlcenter.command.topic.replication=1
+        - confluent.controlcenter.replication.factor=1
+        - confluent.controlcenter.internal.topics.partitions=1
+        - confluent.controlcenter.monitoring.interceptor.topic.partitions=1
+        - confluent.monitoring.interceptor.topic.replication.factor=1
+        - confluent.controlcenter.topic.replication.factor=1
   # env:
   #   - name: confluent.controlcenter.command.topic.replication
   #     value: "3"
   #   - name: confluent.controlcenter.command.topic
   #     value: "_confluent-command"
   #   - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
-  #     value: "broker:29092"
+  #     value: "kafka:9092"
   #   - name: CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER
   #     value: "connect:8083"
   #   - name: CONTROL_CENTER_KSQL_KSQLDB1_URL

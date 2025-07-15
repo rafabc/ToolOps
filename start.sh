@@ -139,6 +139,31 @@ function execute_compose_tool_action() {
         msg "TOOL SELECTED KLAW WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
+    10)
+        cd compose/akhq
+        msg "TOOL SELECTED AKHQ WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
+    11)
+        cd compose/kowl
+        msg "TOOL SELECTED KOWL WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
+    12)
+        cd compose/kaoto
+        msg "TOOL SELECTED KAOTO WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
+    13)
+        cd compose/karavan
+        msg "TOOL SELECTED KARAVAM WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
+    14)
+        cd compose/atlasmap
+        msg "TOOL SELECTED ATLASMAP WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
     esac
 }
 

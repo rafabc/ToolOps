@@ -13,7 +13,7 @@ function install_solace() {
     port_forward "8008" "8008" solace
     port_forward "9000" "9000" solace
     port_forward "1443" "1443" solace
-
+    port_forward "5555" "55555" solace
 
     #  username_admin_globalaccesslevel "admin"
     #  username_admin_password "admin"

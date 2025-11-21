@@ -186,6 +186,10 @@ function kube_apply() {
     12) # ******************************* EVENT CATALOG ************************
         install_event_catalog_helm
         ;;
+    13) # ******************************* KAFBAT UI ************************
+        install_kafbat_helm
+        ;;
+
     esac
 
 }

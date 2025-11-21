@@ -131,8 +131,9 @@ function launch_menu_kube_tools() {
     OPT11=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  N8N")
     OPT12=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  ISTIO")
     OPT13=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  EVENT CATALOG")
+    OPT14=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  KAFBAT UI")
 
-    options=("$OPT1" "$OPT2" "$OPT3" "$OPT4" "$OPT5" "$OPT6" "$OPT7" "$OPT8" "$OPT9" "$OPT10" "$OPT11" "$OPT12" "$OPT13")
+    options=("$OPT1" "$OPT2" "$OPT3" "$OPT4" "$OPT5" "$OPT6" "$OPT7" "$OPT8" "$OPT9" "$OPT10" "$OPT11" "$OPT12" "$OPT13" "$OPT14")
     select_option "${options[@]}"
     choice=$?
     printf "%s$RESET%s\n"

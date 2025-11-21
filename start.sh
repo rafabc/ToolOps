@@ -52,7 +52,8 @@ source ./kubernetes/istio/uninstall.sh
 source ./kubernetes/eventcatalog/install.sh
 source ./kubernetes/eventcatalog/uninstall.sh
 
-
+source ./kubernetes/kafbat-ui/install.sh
+source ./kubernetes/kafbat-ui/uninstall.sh
 
 
 if [[ "$1" == "-v" ]]; then

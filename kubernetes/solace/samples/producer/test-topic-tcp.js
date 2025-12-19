@@ -83,10 +83,15 @@ function httpGet(path) {
 // Crear queue solo si no existe
 async function createQueueIfNotExist() {
     const pathGet = `/SEMP/v2/config/msgVpns/${config.vpnName}/queues/${config.queueName}`;
-    const existingQueue = await httpGet(pathGet);
-    if (existingQueue) {
-        console.log(`[SEMP] La queue ${config.queueName} ya existe`);
-        return;
+    console.log(`[SEMP] Verificando si la queue ${config.queueName} existe...`);
+    try {
+        const existingQueue = await httpGet(pathGet);
+        if (existingQueue) {
+            console.log(`[SEMP] La queue ${config.queueName} ya existe`);
+            return;
+        }
+    } catch (error) {
+        console.error(`[SEMP] Error al verificar la queue: ${error.message}`);
     }
 
     const pathPost = `/SEMP/v2/config/msgVpns/${config.vpnName}/queues`;
@@ -96,7 +101,7 @@ async function createQueueIfNotExist() {
         ingressEnabled: true,
         egressEnabled: true
     };
-
+    console.log(`[SEMP] Creando la queue ${config.queueName}...`);
     await httpPost(pathPost, body);
     console.log(`[SEMP] Queue ${config.queueName} creada`);
 }
@@ -135,16 +140,16 @@ function connectSolace() {
         console.log("[Solace] Conectado");
 
         // Producción de 10 mensajes
-    const topic = solace.SolclientFactory.createTopic(config.topicName);
+        const topic = solace.SolclientFactory.createTopic(config.topicName);
         for (let i = 1; i <= 10; i++) {
             const message = solace.SolclientFactory.createMessage();
             message.setDestination(topic);
             message.setBinaryAttachment(Buffer.from(`Mensaje ${i}`));
             message.setDeliveryMode(solace.MessageDeliveryModeType.DIRECT);
-            
+
             // Asignar partition key
             // Usando ApplicationMessageId para simular partition key
-            message.setApplicationMessageId(`pk-${i}`);            
+            message.setApplicationMessageId(`pk-${i}`);
             session.send(message);
             console.log(`[Producer] Mensaje ${i} enviado con partition key pk-${i}`);
         }

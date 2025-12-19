@@ -30,6 +30,24 @@ function create_namespace() {
         fi
     fi
 
+
+
+    STATUS=$(kubectl get namespace "$NAMESPACE" -o jsonpath='{.status.phase}' 2>/dev/null)
+
+    if [ -z "$STATUS" ]; then
+        msg "❌ El namespace '$NAMESPACE' no existe."
+        exit 1
+    fi
+
+    if [ "$STATUS" = "Terminating" ]; then
+        msg "⚠️  El namespace '$NAMESPACE' está en estado TERMINATING."
+        exit 0
+    else
+        msg "✅ El namespace '$NAMESPACE' está en estado: $STATUS"
+        exit 0
+    fi
+
+
     msg "Cambio a namespace $NAMESPACE"
     if [ "$VERBOSE" -eq 0 ]; then
         kubectl config set-context --current --namespace=$NAMESPACE &>/dev/null

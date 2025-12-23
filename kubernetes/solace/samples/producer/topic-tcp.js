@@ -8,7 +8,7 @@ const config = {
     vpnName: "default",
     userName: "admin",
     password: "admin",
-    queueName: "Q.XAMPLE.TEST.TCP",
+    queueName: "Q.INPUT2",
     topicName: "mi/app/evento/test",
     smfURL: "tcp://localhost:5555"
 };

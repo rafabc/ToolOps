@@ -44,11 +44,10 @@ function create_namespace() {
         exit 0
     else
         msg "✅ El namespace '$NAMESPACE' está en estado: $STATUS"
-        exit 0
     fi
 
 
-    msg "Cambio a namespace $NAMESPACE"
+    msg "Cambiando a namespace $NAMESPACE"
     if [ "$VERBOSE" -eq 0 ]; then
         kubectl config set-context --current --namespace=$NAMESPACE &>/dev/null
     else

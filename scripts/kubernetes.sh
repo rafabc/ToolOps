@@ -115,7 +115,7 @@ function delete_namespace() {
     PROXY_PID=$!
 
     killproxy() {
-        echo $PROXY_PID
+        # echo $PROXY_PID
         kill $PROXY_PID
     }
     trap killproxy EXIT
@@ -124,12 +124,45 @@ function delete_namespace() {
 
     msg_info_idented "killing namespace"
 
-    kubectl get namespace "$PROJECT" -o json | jq 'del(.spec.finalizers[] | select("kubernetes"))' | curl -s -k -H "Content-Type: application/json" -X PUT -o /dev/null --data-binary @- http://localhost:8001/api/v1/namespaces/$PROJECT/finalize && msg_info_idented "Killed namespace: $PROJECT"
 
-    msg_info_idented "namespace killed"
+
+    if kubectl get ns "$PROJECT" >/dev/null 2>&1; then
+        STATUS=$(kubectl get ns "$PROJECT" -o jsonpath='{.status.phase}')
+        if [ "$STATUS" = "Terminating" ]; then
+            msg_info_idented "⚠️  Namespace $PROJECT está en estado Terminating"
+            kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get --ignore-not-found -n "$PROJECT"
+
+            msg_info_idented "Borrando todos los recursos en namespace $PROJECT ..."
+
+            kubectl api-resources --verbs=list --namespaced -o name \
+            | while read resource; do
+                msg_info_idented "Eliminando $resource en $PROJECT"
+                kubectl delete "$resource" -n $PROJECT --all --ignore-not-found &>/dev/null
+            done
+
+            REMAINING=$(kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get -n "$PROJECT" --ignore-not-found)
+
+            if [ -z "$REMAINING" ]; then
+                msg_info_idented "✅ Namespace $PROJECT está completamente vacío - ya se puede eliminar"
+                kubectl delete namespace $NAMESPACE &>/dev/null
+            else
+                msg_info_idented "❌ Aún quedan recursos en $PROJECT:"
+                msg_info_idented "$REMAINING"
+            fi
+        elif [ "$STATUS" = "Active" ]; then
+            msg_info_idented "✅ Namespace $PROJECT está activo procedemos a eliminarlo"
+            # kubectl get namespace "$PROJECT" -o json | jq 'del(.spec.finalizers[] | select("kubernetes"))' | curl -s -k -H "Content-Type: application/json" -X PUT -o /dev/null --data-binary @- http://localhost:8001/api/v1/namespaces/$PROJECT/finalize && msg_info_idented "Killed namespace: $PROJECT"
+            kubectl delete namespace $NAMESPACE &>/dev/null
+        else
+            msg_info_idented "❌ Namespace $PROJECT no existe"
+        fi
+    else
+        msg_info_idented "namespace killed"
+    fi
+
     # proxy will get killed by the trap
 
-    kubectl delete namespace $NAMESPACE &>/dev/null
+    # kubectl delete namespace $NAMESPACE &>/dev/null
 }
 
 function exec_kube_action() {

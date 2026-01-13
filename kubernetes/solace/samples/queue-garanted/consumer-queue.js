@@ -3,41 +3,47 @@ const solace = require('solclientjs');
 const queueName = 'Q.INPUT';
 
 solace.SolclientFactory.init({
-  profile: solace.SolclientFactoryProfiles.version10,
+    profile: solace.SolclientFactoryProfiles.version10,
 });
 
 const session = solace.SolclientFactory.createSession({
-  url: 'tcp://localhost:5555',
-  vpnName: 'default',
-  userName: 'admin',
-  password: 'admin',
-  clientName: 'consumer-queue-nodejs',
+    url: 'tcp://localhost:5555',
+    vpnName: 'default',
+    userName: 'default',
+    password: 'default',
+    clientName: 'consumer-queue-nodejs',
 });
 
 session.on(solace.SessionEventCode.UP_NOTICE, () => {
-  console.log('✅ Conectado al broker');
+    console.log('✅ Conectado al broker');
 
-  const queue = solace.SolclientFactory.createDurableQueueDestination(queueName);
+    const queue = solace.SolclientFactory.createDurableQueueDestination(queueName);
 
-  const consumer = session.createMessageConsumer({
-    queueDescriptor: queue,
-    acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT,
-  });
+    const consumer = session.createMessageConsumer({
+        queueDescriptor: queue,
+        acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT,
+    });
 
-  // ✅ ÚNICO evento obligatorio
-  consumer.on(solace.MessageConsumerEventName.MESSAGE, (message) => {
-    const payload = message.getBinaryAttachment()?.toString();
-    console.log(`← Mensaje recibido: ${payload}`);
+    // ESCUCHA ERRORES ESPECÍFICOS DEL CONSUMIDOR
+    consumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, (error) => {
+        console.error('❌ El consumidor no pudo conectarse a la cola:', error.toString());
+    });
 
-    message.acknowledge();
-    console.log('✔️ ACK');
-  });
+    // consumer.on(solace.MessageConsumerEventName.UP_NOTICE, () => {
+    //     console.log('🚀 Consumidor está listo y escuchando la cola');
+    // });
 
-  consumer.start();
+    // ✅ ÚNICO listener soportado
+    consumer.on(solace.MessageConsumerEventName.MESSAGE, (message) => {
+        console.log('← Mensaje recibido:', message.getBinaryAttachment()?.toString());
+        message.acknowledge();
+    });
+
+    consumer.connect();
 });
 
 session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, (err) => {
-  console.error('❌ Error de sesión:', err);
+    console.error('❌ Error de sesión:', err);
 });
 
 session.connect();

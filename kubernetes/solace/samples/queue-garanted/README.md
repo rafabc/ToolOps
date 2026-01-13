@@ -9,7 +9,7 @@ consumirlos con confirmación manual (client ACK). A diferencia de los ejemplos 
 aquí se usa una cola durable que garantiza la entrega y permite que el broker mantenga mensajes
 hasta que un consumidor los procese y confirme.
 
-#### IMPORTANTE --> La cola debe existir previamente, sino falla
+#### IMPORTANTE --> Si la cola no existe el script la crea via SEMP API
 
 Archivos
 

@@ -4,12 +4,12 @@ const NUM_MESSAGES = 2;
 const DELAY_MS = 200;
 const host = 'localhost';
 const port = 9000;
-const path = '/QUEUE';
+const path = '/Q.INPUT';
 const topic = 'my/topic/http';
-const username = 'test';
-const password = 'test';
+const username = 'admin';
+const password = 'admin';
 
-// Codificamos "test:test" en base64 para usar en el header Authorization
+// Codificamos "admin:admin" en base64 para usar en el header Authorization
 const auth = Buffer.from(`${username}:${password}`).toString('base64');
 
 function sendMessage(index) {

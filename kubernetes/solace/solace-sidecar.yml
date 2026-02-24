@@ -1,0 +1,214 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ema-config
+  namespace: solace
+data:
+  ema.yml: |
+    solace:
+      maas:
+        plugins:
+          kafka:
+            enabled: false
+            client:
+              timeout:
+                value: 60
+                unit: SECONDS
+          confluent:
+            enabled: false
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: solace-discovery-agent
+#   namespace: solace
+#   labels:
+#     app: discovery-agent
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: discovery-agent
+#   template:
+#     metadata:
+#       labels:
+#         app: discovery-agent
+#     spec:
+#       containers:
+
+
+#       volumes:
+#         - name: ema-config-volume
+#           configMap:
+#             name: ema-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solace  # Replace with your desired deployment name
+  labels:
+    app: solace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: solace
+  template:
+    metadata:
+      labels:
+        app: solace
+    spec:
+      containers:
+      - name: discovery-agent
+        image: solace/event-management-agent:latest
+        env:
+          - name: SOLACE_CLOUD_TOKEN
+            value: "eyJhbGciOiJSUzI1NiIsImtpZCI6Im1hYXNfcHJvZF8yMDIwMDMyNiIsInR5cCI6IkpXVCJ9.eyJvcmciOiIwbzdjdWE4N296NCIsIm9yZ1R5cGUiOiJUUklBTCIsInN1YiI6ImIyZHBkNGFwazI2IiwicGVybWlzc2lvbnMiOiJBQUFBQUpRdkFBQUFmemdBNEFFQUFBQUFBQUFBQUFBQUFJQ0J4b2NoQUFqZ0sxY0RnSURLQmQ0RFdNTUQ0NGU1TTRNWkVQaC9Cc0RJNHVjaHZPRUIiLCJhcGlUb2tlbklkIjoidnMwamo4MGpnOHUiLCJpc3MiOiJTb2xhY2UgQ29ycG9yYXRpb24iLCJpYXQiOjE3Njg0Nzk0NjJ9.Vsm3k9dNSn-VbQrLWeIPWctbQ_TAQrKv2Foh3qNfJa-WkckgYMtTrOSYa0rOB8M2GwkC3_7q6wN9j7Wm58Hr1f8f-jleJ2dlzNyHJ3o510uxAmxhWzNii7vs92vxEWn8goA5CaektB8BHw8EvPSiXYxpHqI-9RX8bG7evOh_ErS_3bgQmFYZCzhGjb6cs7yCS4B3d8VX3dMY5vsc9vJgl9LRBo0fcWtvfVTm6ongg37sj3Zkt1VNcO-kD0MZaaeyxbemxFfVehc5VQWHZO0kOvm9EzTFyU7Ebjz613zPWF-5COM9-XRHXTGapRKHxDMCLREJjpcFDxvdz09dsNZ5vA"
+          - name: SOLACE_CLOUD_URL
+            value: "https://console.solace.cloud"
+          - name: AGENT_NAME
+            value: "K8s-Standalone-Agent"
+          # DESACTIVA EL PLUGIN DE KAFKA QUE DA EL ERROR
+          - name: SOLACE_MAAS_PLUGINS_KAFKA_ENABLED
+            value: "false"
+          # OPCIONAL: DESACTIVA OTROS SI NO LOS USAS
+          - name: SOLACE_MAAS_PLUGINS_CONFLUENT_ENABLED
+            value: "false"
+          # 2. VALORES PARA EVITAR EL NULL POINTER EXCEPTION
+          # Estos nombres de variables siguen la jerarquía que el código busca:
+          # KafkaClientConnection -> getTimeout() -> getValue()
+          - name: SOLACE_MAAS_PLUGINS_KAFKA_CLIENT_TIMEOUT_VALUE
+            value: "60"
+          - name: SOLACE_MAAS_PLUGINS_KAFKA_CLIENT_TIMEOUT_UNIT
+            value: "SECONDS"
+          - name: SPRING_PROFILES_ACTIVE
+            value: "solace"
+          # 3. Forzar a Spring a ignorar errores de beans no esenciales
+          # - name: SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING
+          #   value: "true"
+            # Esta propiedad de Java suele deshabilitar el escaneo de otros brokers
+          - name: JAVA_OPTS
+            value: "-Dsolace.maas.plugins.kafka.enabled=false -Dsolace.maas.plugins.confluent.enabled=false"
+        volumeMounts:
+          - name: ema-config-volume
+            mountPath: /config/ema.yml
+            subPath: ema.yml
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1512Mi
+          limits:
+            cpu: 500m
+            memory: 1512Mi
+      - name: solace
+        image: solace/solace-pubsub-standard:10.25.13
+        resources:
+          requests:
+            cpu: 2000m  # Adjust CPU request if needed
+            memory: 6.0Gi  # Increase memory request to 2.5 GiB (or slightly higher)
+          limits:
+            cpu: 3000m  # Adjust CPU limit if needed
+            memory: 6.0Gi
+        volumeMounts:
+           - mountPath: /dev/shm
+             name: dshm
+        ports:
+        - containerPort: 8008
+          protocol: TCP
+        - containerPort: 1443
+          protocol: TCP
+        - containerPort: 1943
+          protocol: TCP
+        - containerPort: 1883
+          protocol: TCP
+        - containerPort: 5671
+          protocol: TCP
+        - containerPort: 5672
+          protocol: TCP
+        - containerPort: 8000
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        - containerPort: 8883
+          protocol: TCP
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 9000
+          protocol: TCP
+        - containerPort: 9443
+          protocol: TCP
+        - containerPort: 55555
+          protocol: TCP
+        - containerPort: 55554
+          protocol: TCP
+        - containerPort: 55003
+          protocol: TCP
+        - containerPort: 55443
+          protocol: TCP
+        - containerPort: 2222
+          protocol: TCP
+        env:
+          - name: username_admin_globalaccesslevel
+            value: "admin"
+          - name: username_admin_password
+            value: "admin"
+          - name: system_scaling_maxconnectioncount
+            value: "1000"
+          - name: storage_maxspoolusage
+            value: "10000"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        - name: ema-config-volume
+          configMap:
+            name: ema-config
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "solace"
+  namespace: solace
+spec:
+  ports:
+  - name: smf
+    port: 55555
+    protocol: TCP
+    targetPort: 55555
+  - name: "web-http"
+    port: 8008
+    protocol: "TCP"
+    targetPort: 8008
+  - name: "web-tls"
+    port: 1443
+    protocol: "TCP"
+    targetPort: 1443
+  - name: "semp-manager"
+    port: 8080
+    protocol: "TCP"
+    targetPort: 8080
+  - name: "rest-vpn"
+    port: 9000
+    protocol: "TCP"
+    targetPort: 9000
+  selector:
+    app: "solace"
+  type: "ClusterIP"
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-karavan
+  namespace: solace
+spec:
+  podSelector: {}
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          namespace: karavan

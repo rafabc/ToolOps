@@ -1,0 +1,18 @@
+services:
+  akhq:
+    image: tchiotludo/akhq:0.24.0
+    restart: unless-stopped
+    container_name: akhq
+    hostname: akhq
+    # environment:
+    #   JVM_OPTS_FILE: /app/jvm.options
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./application.yml:/app/application.yml
+    networks:
+      - confluent_default  
+      
+networks:
+  confluent_default:
+    external: true      

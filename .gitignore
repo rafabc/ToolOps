@@ -5,3 +5,5 @@ node_modules
 logs
 ./compose/.DS_Store
 ToolOps.code-workspace
+kubernetes/solace/solace-schema-registry
+kubernetes/solace/solace_full_chain.crt

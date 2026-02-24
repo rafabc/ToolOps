@@ -16,6 +16,9 @@ source ./scripts/builders/build-tool.sh
 source ./scripts/kubernetes.sh
 source ./scripts/spinner.sh
 
+source ./kubernetes/dashboard/install.sh
+source ./kubernetes/dashboard/uninstall.sh
+
 source ./kubernetes/activemq/install.sh
 source ./kubernetes/activemq/uninstall.sh
 
@@ -49,6 +52,11 @@ source ./kubernetes/n8n/uninstall.sh
 source ./kubernetes/istio/install.sh
 source ./kubernetes/istio/uninstall.sh
 
+source ./kubernetes/eventcatalog/install.sh
+source ./kubernetes/eventcatalog/uninstall.sh
+
+source ./kubernetes/kafbat-ui/install.sh
+source ./kubernetes/kafbat-ui/uninstall.sh
 
 
 if [[ "$1" == "-v" ]]; then
@@ -135,6 +143,31 @@ function execute_compose_tool_action() {
         msg "TOOL SELECTED KLAW WITH ACTION $action_selected"
         exec_tool_action $action_selected
         ;;
+    10)
+        cd compose/akhq
+        msg "TOOL SELECTED AKHQ WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
+    11)
+        cd compose/kowl
+        msg "TOOL SELECTED KOWL WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
+    12)
+        cd compose/kaoto
+        msg "TOOL SELECTED KAOTO WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
+    13)
+        cd compose/karavan
+        msg "TOOL SELECTED KARAVAM WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
+    14)
+        cd compose/atlasmap
+        msg "TOOL SELECTED ATLASMAP WITH ACTION $action_selected"
+        exec_tool_action $action_selected
+        ;;
     esac
 }
 
@@ -196,6 +229,10 @@ function execute_kube_tool_action() {
     11)
         cd kubernetes/istio
         msg "TOOL SELECTED" "ISTIO" "WITH ACTION $action_selected IN tool $tool_selected"
+        ;;
+    12)
+        cd kubernetes/eventcatalog
+        msg "TOOL SELECTED" "EVENT CATALOG" "WITH ACTION $action_selected IN tool $tool_selected"
         ;;
     esac
 }

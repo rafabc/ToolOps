@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orderMessage xmlns="http://example.com/order">
+    <header>
+        <messageId>ORD123456789</messageId>
+        <timestamp>2025-06-14T10:35:00Z</timestamp>
+        <sourceSystem>WebStore</sourceSystem>
+    </header>
+    <customer>
+        <id>987654</id>
+        <name>Juan Pérez</name>
+        <email>juan.perez@example.com</email>
+    </customer>
+    <order>
+        <orderId>ORD-2025-0001</orderId>
+        <status>Processing</status>
+        <items>
+            <item>
+                <sku>ABC123</sku>
+                <quantity>2</quantity>
+                <price>49.99</price>
+            </item>
+            <item>
+                <sku>XYZ789</sku>
+                <quantity>1</quantity>
+                <price>129.50</price>
+            </item>
+        </items>
+        <total>229.48</total>
+    </order>
+</orderMessage>

@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "solace": "^1.2.0",
+    "solclientjs": "^10.18.2",
+    "ajv": "^8.2.0",
+    "ajv-formats": "^2.1.1"
+  }
+}

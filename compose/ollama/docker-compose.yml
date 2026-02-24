@@ -1,0 +1,28 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: llama3
+    ports:
+      - "11434:11434"
+    # volumes:
+    #   - ollama:/root/.ollama
+    restart: unless-stopped
+
+  llama-loader:
+    image: curlimages/curl:latest
+    depends_on:
+      - ollama
+    entrypoint: >
+      sh -c "
+      echo 'Esperando a que Ollama esté disponible...';
+      until curl -s http://ollama:11434 > /dev/null; do
+        sleep 2;
+      done;
+      echo 'Ollama disponible, descargando modelo llama3...';
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\":\"llama3\"}' -H 'Content-Type: application/json';
+      echo 'Modelo descargado';
+      "
+    restart: "no"
+
+volumes:
+  ollama:

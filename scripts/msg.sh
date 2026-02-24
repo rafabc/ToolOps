@@ -29,7 +29,7 @@ function msg_ko_exit() {
 }
 
 function msg_check_success() {
-	printf "%s$GREEN%s            %s$OK2%s  %s$1%s";
+	printf "%s$GREEN%s            %s$OK2%s  %s$1%s %s$PURPLE%s$2%s$GREEN%s%s$3 %s$RESET%s\n";
 	printf "%s$GREEN%s%s$RESET%s\n"
 }
 

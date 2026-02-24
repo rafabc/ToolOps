@@ -1,0 +1,10 @@
+version: '3'
+services:
+  kaoto:
+    image: kaotoio/standalone:latest-native
+    ports: 
+      - 8077:8081
+
+networks:
+  confluent_default:
+    external: true # This network should be created by the Confluent Platform docker-compose setup

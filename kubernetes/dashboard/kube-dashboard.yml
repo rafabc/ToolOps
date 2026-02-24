@@ -260,7 +260,6 @@ subjects:
     namespace: kubernetes-dashboard
 
 ---
-
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -299,6 +298,13 @@ spec:
             # If not specified, Dashboard will attempt to auto discover the API server and connect
             # to it. Uncomment only if the default does not work.
             # - --apiserver-host=http://my-address:port
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           volumeMounts:
             - name: kubernetes-dashboard-certs
               mountPath: /certs

@@ -17,7 +17,7 @@ function install_activemq() {
 	fi
 
 	apply_resources "activemq.yml"
-
+	msg "Waiting for ActiveMQ pods to be running..."
 	wait_pod_running "active-mq"
 
 	port_forward "8228" "8161" active-mq #dashboard  #OJO NO SE PUEDE REDIRIGIR EL PUERTO 8161 ES EL DE DOCKER DESKTOP

@@ -1,0 +1,44 @@
+name: karavan
+
+services:
+
+  karavan:
+    container_name: karavan
+    image: ghcr.io/apache/camel-karavan:4.10.2
+    ports:
+      - "8080:8080"
+    environment:
+      - KARAVAN_GIT_REPOSITORY=https://github.com/rafabc/karavan-repository
+      - KARAVAN_GIT_USERNAME=rafabc
+      - KARAVAN_GIT_PASSWORD=***
+      - KARAVAN_GIT_BRANCH=main
+      - KARAVAN_CONTAINER_IMAGE_REGISTRY=registry-karavan:5000
+      - KARAVAN_CONTAINER_IMAGE_REGISTRY_USERNAME=
+      - KARAVAN_CONTAINER_IMAGE_REGISTRY_PASSWORD=
+      - KARAVAN_CONTAINER_IMAGE_GROUP=karavan
+      - KARAVAN_DOCKER_NETWORK=confluent_default
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"    
+    labels:
+      - "org.apache.camel.karavan/type=internal"    
+    networks:
+      - confluent_default
+
+  registry-karavan:
+    container_name: registry-karavan
+    image: registry:2
+    restart: always
+    ports:
+      - "5555:5000"
+    labels:
+      - "org.apache.camel.karavan/type=internal"  
+    networks:
+      - confluent_default  
+
+# networks:
+#   karavan:
+#     name: karavan
+
+networks:
+  confluent_default:
+    external: true      

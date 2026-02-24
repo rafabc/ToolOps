@@ -1,0 +1,8 @@
+akhq:
+  connections:
+    my-cluster:
+      properties:
+        bootstrap.servers: "broker:29092"
+
+  security:
+    default-group: admin

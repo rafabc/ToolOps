@@ -1,0 +1,14 @@
+services:
+  atlasmap:
+    image: atlasmap/atlasmap:2.5.2
+    # platform: linux/amd64
+    restart: unless-stopped
+    container_name: atlasmap
+    ports:
+      - "8585:8585"
+#     networks:
+#       - confluent_default  
+      
+# networks:
+#   confluent_default:
+#     external: true      

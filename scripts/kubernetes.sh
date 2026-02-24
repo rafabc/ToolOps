@@ -1,5 +1,13 @@
 #!/bin/bash
 
+
+
+# Creates a new Kubernetes namespace.
+# Usage: create_namespace <namespace_name>
+# Arguments:
+#   namespace_name - The name of the namespace to create.
+# Example:
+#   create_namespace my-namespace
 function create_namespace() {
 
     NAMESPACE=$1
@@ -31,7 +39,6 @@ function create_namespace() {
     fi
 
 
-
     STATUS=$(kubectl get namespace "$NAMESPACE" -o jsonpath='{.status.phase}' 2>/dev/null)
 
     if [ -z "$STATUS" ]; then
@@ -46,16 +53,20 @@ function create_namespace() {
         msg "✅ El namespace '$NAMESPACE' está en estado: $STATUS"
     fi
 
-
     msg "Cambiando a namespace $NAMESPACE"
     if [ "$VERBOSE" -eq 0 ]; then
         kubectl config set-context --current --namespace=$NAMESPACE &>/dev/null
     else
         kubectl config set-context --current --namespace=$NAMESPACE
     fi
-
 }
 
+
+# Deletes a specified Kubernetes namespace.
+# Usage: delete_namespace <namespace>
+# Arguments:
+#   <namespace> - The name of the Kubernetes namespace to delete.
+# This function will attempt to delete the given namespace using kubectl.
 function delete_namespace() {
 
     #FUNCIONA
@@ -125,7 +136,6 @@ function delete_namespace() {
     msg_info_idented "killing namespace"
 
 
-
     if kubectl get ns "$PROJECT" >/dev/null 2>&1; then
         STATUS=$(kubectl get ns "$PROJECT" -o jsonpath='{.status.phase}')
         if [ "$STATUS" = "Terminating" ]; then
@@ -165,6 +175,22 @@ function delete_namespace() {
     # kubectl delete namespace $NAMESPACE &>/dev/null
 }
 
+
+
+# Executes a specified Kubernetes action.
+# 
+# This function is intended to perform a Kubernetes-related operation.
+# The specific action and its parameters should be provided when calling the function.
+#
+# Usage:
+#   exec_kube_action <action> [args...]
+#
+# Arguments:
+#   <action>   The Kubernetes action to execute (0, 1, 2).
+#   [args...]  Additional arguments to pass to the kubectl command.
+#
+# Example:
+#   exec_kube_action 1 confluent
 function exec_kube_action() {
 
     ACTION=$1
@@ -183,6 +209,13 @@ function exec_kube_action() {
     esac
 }
 
+
+
+# Applies Kubernetes manifests using kubectl.
+# Usage: kube_apply <manifest_file>
+# Arguments:
+#   manifest_file - Path to the Kubernetes manifest file to apply.
+# This function wraps the kubectl apply command for convenience.
 function kube_apply() {
     TOOL=$1
 
@@ -193,10 +226,7 @@ function kube_apply() {
 
     case "$TOOL" in
     0) # ************************* KUBERNETES DASHBOARD ******************************
-        kubectl apply -f *
-        sleep 3
-        kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard 9090:9090 &
-        disown
+        install_kubernetes_dashboard
         ;;
     1) # ************************* ACTIVE MQ **************************
         install_activemq
@@ -244,6 +274,14 @@ function kube_apply() {
 
 }
 
+
+
+# Deletes Kubernetes resources using kubectl.
+# Usage: kube_delete  <tool_num>
+# Arguments:
+#   tool_num - The number of the tool to delete.
+# Example:
+#   kube_delete 1
 function kube_delete() {
     TOOL=$1
     case "$TOOL" in
@@ -307,6 +345,23 @@ function kube_delete() {
     esac
 }
 
+
+# -----------------------------------------------------------------------------
+# kube_check
+#
+# Description:
+#   Checks the status of a Kubernetes application.
+#
+# Usage:
+#   kube_check tool_num [-v]
+#
+# Arguments:
+#   tool_num - The number of the tool to check.
+#
+# Outputs:
+#   Prints status or diagnostic information about the Kubernetes cluster.
+#
+# -----------------------------------------------------------------------------
 function kube_check() {
     TOOL=$1
     VERBOSE=false
@@ -427,6 +482,11 @@ function kube_check() {
     esac
 }
 
+
+# Applies Kubernetes resource configurations using kubectl.
+# This function should contain the logic to apply manifests or resource files
+# to a Kubernetes cluster. Ensure that kubectl is configured with the correct
+# context and permissions before invoking this function.
 function apply_resources() {
     RESOURCES_FILE=$1
     msg "EXEC KUBECTL APPLY" "$RESOURCES_FILE"
@@ -507,12 +567,22 @@ function delete_resources() {
 
 }
 
+# Port forwards a Kubernetes service to a local port.
+# Usage: port_forward <namespace> <resource_type> <resource_name> <local_port>:<remote_port>
+#
+# Arguments:
+#   PORT_FORWARD - The local port to forward to.
+#   PORT - The remote port on the Kubernetes service.
+#   SERVICE - The name of the Kubernetes service to forward.
+#
+# Example: port_forward default svc/my-service 8080:80
 function port_forward() {
 
     PORT_FORWARD=$1
     PORT=$2
     SERVICE=$3
-
+    echo
+    msg "Enviando puerto" "$PORT del servicio $SERVICE al puerto local" "$PORT_FORWARD"
     msg "PORT FORWARD SVC" "$SERVICE $PORT_FORWARD:$PORT"
     msg "Cheking port forward in use"
     PID_PORT=$(lsof -i :$PORT_FORWARD | awk '{print $2}' | tail -1)
@@ -524,27 +594,67 @@ function port_forward() {
     fi
 
     if [ $? -eq 0 ]; then
-        msg_info "PID_PORT $PID_PORT de $SERVICE localizado, se procede a matarlo"
+        msg_info "PID_PORT $PID_PORT para port forward $PORT_FORWARD de $SERVICE localizado, se procede a matarlo"
         kill -9 $PID_PORT
     else
-        msg_warn "PID_PORT $PID_PORT de $PORT_FORWARD no existe, dashabord ya desconectado port forward"
+        msg_warn "PID_PORT $PID_PORT de $PORT_FORWARD no existe, el puerto esta libre para su uso"
     fi
-
-    echo
+    
     if [ "$VERBOSE" -eq 0 ]; then
-        kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT &
-        disown &>/dev/null
+        kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT >/dev/null 2>&1 &
+        disown
+
     else
         kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT &
-        disown
+        disown &>/dev/null
     fi
+    msg_check_success "Port forward iniciado para $SERVICE en puerto local $PORT_FORWARD al puerto remoto $PORT"
 }
 
+
+# Waits for a Kubernetes pod to reach the "Running" state.
+# Usage: wait_pod_running <namespace> <pod_name>
+# Arguments:
+#   pod_name  - The name of the pod to wait for.
+# The function polls the pod status and waits until it is "Running".
 function wait_pod_running() {
     POD_NAME=$1
-    msg "WAITING POD RUNNING" "$POD"
-    POD=$(kubectl get pods -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$POD_NAME")
-    kubectl get pod $POD
-    kubectl wait --for=condition=ContainersReady pod/$POD --timeout=3m &
+    msg "WAITING POD RUNNING" "$POD_NAME"
+    #POD=$(kubectl get pods -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep "^$POD_NAME")
+    POD=$(kubectl get pods -o name | grep "^pod/$POD_NAME" | head -1)
+
+     if [ -z "$POD" ]; then
+        msg_error "No pod found for $POD_NAME"
+        return 1
+    fi
+
+    if [ "$VERBOSE" -eq 0 ]; then
+        kubectl get pod $POD >/dev/null &>/dev/null
+    else
+        kubectl get pod $POD
+    fi
+
+
+    READY=$(kubectl get $POD -o jsonpath='{.status.conditions[?(@.type=="ContainersReady")].status}')
+
+    if [ "$READY" = "True" ]; then
+        msg_check_success "POD READY" "$POD_NAME is in ContainersReady=True state" 
+        return 0
+    fi
+
+    kubectl wait --for=condition=ContainersReady $POD --timeout=3m &
     spinner $! "Waiting for condition container ready"
+    WAIT_RC=$?
+    READY=$(kubectl get $POD -o jsonpath='{.status.conditions[?(@.type=="ContainersReady")].status}')
+
+    if [ "$WAIT_RC" -eq 0 ] && [ "$READY" = "True" ]; then
+        STATE=$(kubectl get $POD -o jsonpath='{range .status.containerStatuses[*]} {range .state.waiting}{.reason}{end} {range .state.running}Running{end} {range .state.terminated}{.reason}{end} {end}')
+        msg_check_success "POD READY STATE ->" "$STATE" "$POD_NAME is in ContainersReady=True state"
+    else
+        msg_info "Pod $POD_NAME failed to reach ready state within timeout. Current status:"
+        msg_info_idented "Current READY status: $READY y WAIT_RC: $WAIT_RC"
+        msg_check_fail "POD NOT READY" "$POD failed to reach ready state"
+        kubectl get $POD
+        return 1
+    fi
 }

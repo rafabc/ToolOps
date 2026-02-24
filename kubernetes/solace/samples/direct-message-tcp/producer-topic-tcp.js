@@ -15,6 +15,7 @@ and set message properties (e.g., contentType) so consumers can parse the payloa
 
 
 const solace = require('solclientjs');
+const { setTimeout } = require('node:timers/promises');
 
 // OBLIGATORIO
 solace.SolclientFactory.init({
@@ -29,22 +30,15 @@ const session = solace.SolclientFactory.createSession({
 	clientName: 'producer-orders-nodejs'
 });
 
-const TOTAL_MESSAGES = 100;
-const DELAY_MS = 100;
+const TOTAL_MESSAGES = 200000;
 
-session.on(solace.SessionEventCode.UP_NOTICE, () => {
+session.on(solace.SessionEventCode.UP_NOTICE, async () => {
 	console.log('✅ Conectado a Solace (producer)');
 
-	let counter = 1;
+	console.log(`Enviando ${TOTAL_MESSAGES} mensajes a topic 'orders/europe/spain/created'...`);
+	console.time('Timpo total envío');
 
-	const intervalId = setInterval(() => {
-		if (counter > TOTAL_MESSAGES) {
-			clearInterval(intervalId);
-
-			// 👉 Desconexión cuando termina el envío
-			session.disconnect();
-			return;
-		}
+	for (let index = 0; index < TOTAL_MESSAGES; index++) {
 
 		const msg = solace.SolclientFactory.createMessage();
 		msg.setDestination(
@@ -52,18 +46,28 @@ session.on(solace.SessionEventCode.UP_NOTICE, () => {
 		);
 
 		msg.setBinaryAttachment(Buffer.from(JSON.stringify({
-			orderId: counter,
+			orderId: index,
 			status: 'CREATED'
 		})));
 
 		msg.setDeliveryMode(solace.MessageDeliveryModeType.DIRECT);
 
 		session.send(msg);
-		console.log(`🚀 Mensaje ${counter} enviado`);
+		//console.log(`🚀 Mensaje ${index} enviado`);
+		if (index % 500 === 0) {
+			await setTimeout(1); // Un pequeño respiro cada 500 mensajes
+		}
+	}
+	console.timeEnd('Timpo total envío');
+	session.disconnect();
+	return;
 
-		counter++;
-	}, DELAY_MS);
 });
+
+// session.on(solace.SessionEventCode.BUFFER_RELEASED, () => {
+// 	console.log('🔄 Buffer liberado, listo para enviar más mensajes')
+// });
+
 
 session.on(solace.SessionEventCode.DISCONNECTED, () => {
 	console.log('🔌 Producer desconectado');

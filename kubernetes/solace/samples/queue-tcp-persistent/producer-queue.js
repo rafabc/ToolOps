@@ -8,7 +8,7 @@ const https = require('https');
 
 const SEMP_CONFIG = {
 	host: 'localhost',
-	port: 8080,
+	port: 8088,
 	vpn: 'default',
 	username: 'admin',
 	password: 'admin',
@@ -30,8 +30,7 @@ function ensureQueueExists(queueName, config) {
 		`${config.username}:${config.password}`
 	).toString('base64');
 
-	const basePath =
-		`/SEMP/v2/config/msgVpns/${encodeURIComponent(config.vpn)}/queues`;
+	const basePath = `/SEMP/v2/config/msgVpns/${encodeURIComponent(config.vpn)}/queues`;
 
 	return new Promise((resolve, reject) => {
 
@@ -86,12 +85,12 @@ function ensureQueueExists(queueName, config) {
 		getReq.end();
 
 		/* -------- 2️⃣ POST: crear cola -------- */
-
 		function createQueue() {
 			const body = JSON.stringify({
 				queueName: queueName,
 				accessType: "exclusive",
-				permission: "consume",
+				maxMsgSpoolUsage: 100,
+				permission: "modify-topic",
 				ingressEnabled: true,
 				egressEnabled: true
 			});
@@ -111,24 +110,23 @@ function ensureQueueExists(queueName, config) {
 
 			const postReq = protocol.request(postOptions, postRes => {
 				let postBody = '';
-
 				postRes.on('data', chunk => postBody += chunk);
 				postRes.on('end', () => {
 					if (postRes.statusCode === 201 || postRes.statusCode === 200) {
 						console.log(`🎉 Cola "${queueName}" creada correctamente`);
 						resolve({ created: true });
 					} else {
-						reject(new Error(
-							`❌ Error creando cola: HTTP ${postRes.statusCode} - ${postBody}`
-						));
+						reject(new Error(`❌ Error creando cola: HTTP ${postRes.statusCode} - ${postBody}`));
 					}
 				});
 			});
 
 			postReq.on('error', reject);
-			postReq.write(body);
-			postReq.end();
+			postReq.write(body); // <-- Antes decía postData
+			postReq.end();       // <-- Antes decía req.end()
 		}
+
+
 	});
 }
 
@@ -143,8 +141,8 @@ solace.SolclientFactory.init({
 const session = solace.SolclientFactory.createSession({
 	url: 'tcp://localhost:5555',
 	vpnName: 'default',
-	userName: 'default',
-	password: 'default',
+	userName: 'admin',
+	password: 'admin',
 	connectRetries: 3,
 	reconnectRetries: 3,
 	clientName: 'producer-queue-nodejs',
@@ -176,10 +174,6 @@ session.on(solace.SessionEventCode.UP_NOTICE, () => {
 		);
 		message.setBinaryAttachment(`Mensaje número ${count + 1}`);
 		message.setCorrelationKey(`${count + 1}`);
-
-		message.setDestination(
-			solace.SolclientFactory.createTopicDestination('Q.INPUT')
-		);
 
 		try {
 			session.send(message);
@@ -220,10 +214,14 @@ session.on(
 
 (async () => {
 	try {
-		await ensureQueueExists(queueName, SEMP_CONFIG);
+		const result = await ensureQueueExists(queueName, SEMP_CONFIG);
+		if (result.created) {
+			console.log('⏳ Esperando sincronización del Broker...');
+			await new Promise(r => setTimeout(r, 2000)); // 2 segundos de respiro
+		}
 		console.log('🚀 Cola asegurada, conectando productor...');
 		session.connect();
 	} catch (err) {
-		console.error(err.message);
+		console.error("Fallo crítico:", err.message);
 	}
 })();

@@ -16,6 +16,9 @@ source ./scripts/builders/build-tool.sh
 source ./scripts/kubernetes.sh
 source ./scripts/spinner.sh
 
+source ./kubernetes/dashboard/install.sh
+source ./kubernetes/dashboard/uninstall.sh
+
 source ./kubernetes/activemq/install.sh
 source ./kubernetes/activemq/uninstall.sh
 

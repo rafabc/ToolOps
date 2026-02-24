@@ -4,7 +4,7 @@ const solace = require('solclientjs').debug;
 // CONFIGURACIÓN
 const config = {
     solaceHost: "localhost",
-    solacePort: 8080,
+    solacePort: 8088,
     vpnName: "default",
     userName: "admin",
     password: "admin",
@@ -13,7 +13,7 @@ const config = {
     smfURL: "tcp://localhost:5555"
 };
 
-// Función auxiliar HTTP POST
+
 function httpPost(path, body) {
     return new Promise((resolve, reject) => {
         const auth = Buffer.from(`${config.userName}:${config.password}`).toString('base64');
@@ -57,7 +57,7 @@ function httpGet(path) {
             method: 'GET',
             headers: {
                 'Authorization': `Basic ${auth}`,
-                'Accept': 'application/json'
+               // 'Accept': 'application/json'
             }
         };
 
@@ -66,10 +66,13 @@ function httpGet(path) {
             res.on('data', chunk => data += chunk);
             res.on('end', () => {
                 if (res.statusCode === 200) {
-                    resolve(JSON.parse(data));
+                    console.log(`✅ GET 200 en ${path}`);
+                    resolve(data);
                 } else if (res.statusCode === 404) {
+                    console.warn(`⚠️  QUEUE O SUSCRIPCIÓN NO EXISTE: ${path}`);   
                     resolve(null); // no existe
                 } else {
+                    console.error(`Error HTTP ${res.statusCode} en ${path}: ${data}`);
                     reject(new Error(`HTTP ${res.statusCode}: ${data}`));
                 }
             });

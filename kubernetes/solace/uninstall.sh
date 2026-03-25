@@ -5,12 +5,12 @@ function uninstall_solace() {
     NAMESPACE="solace"
 
     # Comprueba si el namespace existe usando el comando "kubectl get namespace"
-    msg_info "Cambio a namespace solace"
+    msg_info "Cambio a namespace $NAMESPACE"
     kubectl get namespace "$NAMESPACE" &>/dev/null
 
     # Si el comando no devuelve un error, el namespace existe
     if [ $? -eq 0 ]; then
-        kubectl config set-context --current --namespace=solace &>/dev/null
+        kubectl config set-context --current --namespace=$NAMESPACE &>/dev/null
     else
         msg_warn_idented "Namespace $NAMESPACE no existe - se continua el proceso de borrado"
     fi

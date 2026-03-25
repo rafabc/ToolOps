@@ -45,6 +45,10 @@ function msg_warn() {
 	printf "%s$PURPLE%s       	    %s$WARN%s  %s$1%s";
 	printf "%s$PURPLE%s%s$RESET%s\n"
 }
+function msg_error() {
+	printf "%s$RED%s       	    %s$ERROR%s  %s$1%s";
+	printf "%s$RED%s%s$RESET%s\n"
+}
 
 function msg_info_idented() {
 	printf "%s$YELLOW%s            	%s$INFO%s  %s$1%s";

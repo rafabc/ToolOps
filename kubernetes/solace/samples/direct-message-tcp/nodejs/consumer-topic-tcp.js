@@ -1,20 +1,25 @@
 const solace = require('solclientjs');
 
-// Configuración básica
-const config = {
-    url: 'tcp://localhost:5555',        // ej: wss://mr-xyz.messaging.solace.cloud:443
-    vpnName: 'default',
-    userName: "admin",
-    password: "admin",
-    reconnectRetries: 3,
-    clientName: 'consumer-orders-nodejs'
-};
 
 solace.SolclientFactory.init({
     profile: solace.SolclientFactoryProfiles.version10
 });
 
-const session = solace.SolclientFactory.createSession(config);
+
+// Definimos la URL: Prioridad a la variable de entorno, si no existe, usa localhost
+const SOLACE_URL = process.env.SOLACE_URL || 'tcp://localhost:5555';
+
+const session = solace.SolclientFactory.createSession({
+    url: SOLACE_URL,
+    vpnName: 'default',
+    userName: process.env.BROKER_USER || 'admin',
+    password: process.env.BROKER_PASSWORD || 'admin',
+    clientName: 'consumer-direct-message-tcp-smf-nodejs'
+});
+
+
+
+
 
 // Eventos de sesión
 session.on(solace.SessionEventCode.UP_NOTICE, () => {
@@ -38,9 +43,16 @@ session.on(solace.SessionEventCode.MESSAGE, (message) => {
         ? message.getBinaryAttachment().toString()
         : message.getSdtContainer()?.getValue();
 
-    console.log('📨 Mensaje recibido');
-    console.log('Topic:', message.getDestination().getName());
-    console.log('Payload:', payload);
+    const ahora = new Date();
+    const horaLog = ahora.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        fractionalSecondDigits: 3,
+        hour12: false
+    });
+
+    console.log(`[${horaLog}] 📨 Mensaje recibido ID: ${message.getApplicationMessageId()} - Contenido: ${message.getBinaryAttachment()?.toString()}`);
 });
 
 // Manejo de errores

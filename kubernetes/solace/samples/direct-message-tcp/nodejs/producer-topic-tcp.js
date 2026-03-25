@@ -17,23 +17,28 @@ and set message properties (e.g., contentType) so consumers can parse the payloa
 const solace = require('solclientjs');
 const { setTimeout } = require('node:timers/promises');
 
-// OBLIGATORIO
+
 solace.SolclientFactory.init({
 	profile: solace.SolclientFactoryProfiles.version10
 });
 
+// Definimos la URL: Prioridad a la variable de entorno, si no existe, usa localhost
+const SOLACE_URL = process.env.SOLACE_URL || 'tcp://localhost:5555';
+
 const session = solace.SolclientFactory.createSession({
-	url: 'tcp://localhost:5555',
+	url: SOLACE_URL,
 	vpnName: 'default',
-	userName: 'admin',
-	password: 'admin',
-	clientName: 'producer-orders-nodejs'
+	userName: process.env.BROKER_USER || 'admin',
+	password: process.env.BROKER_PASSWORD || 'admin',
+	clientName: 'producer-direct-message-tcp-smf-nodejs'
 });
 
-const TOTAL_MESSAGES = 200000;
+
+
+const TOTAL_MESSAGES = 200000000;
 
 session.on(solace.SessionEventCode.UP_NOTICE, async () => {
-	console.log('✅ Conectado a Solace (producer)');
+	console.log(`✅ Conectado a Solace (producer) en: ${SOLACE_URL}`);
 
 	console.log(`Enviando ${TOTAL_MESSAGES} mensajes a topic 'orders/europe/spain/created'...`);
 	console.time('Timpo total envío');
@@ -45,8 +50,14 @@ session.on(solace.SessionEventCode.UP_NOTICE, async () => {
 			solace.SolclientFactory.createTopic('orders/europe/spain/created')
 		);
 
+		const hInicio = new Date().toLocaleTimeString('es-ES', {
+			hour: '2-digit', minute: '2-digit', second: '2-digit',
+			fractionalSecondDigits: 3, hour12: false
+		});
+        msg.setApplicationMessageId(`msg-${index}`);
 		msg.setBinaryAttachment(Buffer.from(JSON.stringify({
 			orderId: index,
+			horaEnvio: hInicio,
 			status: 'CREATED'
 		})));
 
@@ -54,8 +65,8 @@ session.on(solace.SessionEventCode.UP_NOTICE, async () => {
 
 		session.send(msg);
 		//console.log(`🚀 Mensaje ${index} enviado`);
-		if (index % 500 === 0) {
-			await setTimeout(1); // Un pequeño respiro cada 500 mensajes
+		if (index % 50 === 0) {
+			await setTimeout(100); // Un pequeño respiro cada 50 mensajes
 		}
 	}
 	console.timeEnd('Timpo total envío');

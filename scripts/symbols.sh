@@ -8,8 +8,10 @@ ARROW2="\u27a4"
 
 OK=✨ 
 OK2=✔
+OK3=✅
 ARROW=▶
-ERROR=✘
+ERROR=❌
+ERROR2=✘
 STAR=★
 STAR2=☆
 SUN=☀
@@ -18,3 +20,6 @@ STARS=✨
 
 INFO=❗
 WARN=⚠️
+
+MSG=📨
+

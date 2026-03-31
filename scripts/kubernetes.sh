@@ -12,6 +12,9 @@ function create_namespace() {
 
     NAMESPACE=$1
 
+
+    msg "Checking namespace $NAMESPACE"
+
     if [ "$VERBOSE" -eq 0 ]; then
         kubectl get namespace "$NAMESPACE" &>/dev/null
         NS=$?
@@ -385,14 +388,7 @@ function kube_check() {
         fi
         ;;
     1)
-        msg "Check ActiveMQ status"
-        ACTIVEMQ_POD=$(kubectl get pods -n activemq -l app=activemq -o jsonpath='{.items[0].metadata.name}')
-        STATUS=$(kubectl get pod $ACTIVEMQ_POD -n activemq -o jsonpath='{.status.phase}')
-        if [ "$STATUS" == "Running" ]; then
-            msg_check_success "POD ActiveMQ $ACTIVEMQ_POD Status: $STATUS"
-        else
-            msg_check_fail "POD ActiveMQ $ACTIVEMQ_POD Status: $STATUS"
-        fi
+        check_activemq
         ;;
     2)
         NAMESPACE="camel-k"
@@ -478,6 +474,98 @@ function kube_check() {
                 fi
             fi
         done
+        ;;
+   
+    3)
+        msg "Check Redis status"
+        REDIS_POD=$(kubectl get pods -n redis -l app=redis -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kubectl get pod $REDIS_POD -n redis -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD Redis $REDIS_POD Status: $STATUS"
+        else
+            msg_check_fail "POD Redis $REDIS_POD Status: $STATUS"
+        fi
+        ;;
+    4)
+        msg "Check Linkerd status"
+        linkerd check --verbose
+        ;;
+    5)
+        msg "Check Keycloak status"
+        KEYCLOAK_POD=$(kubectl get pods -n keycloak -l app=keycloak -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kubectl get pod $KEYCLOAK_POD -n keycloak -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD Keycloak $KEYCLOAK_POD Status: $STATUS"
+        else
+            msg_check_fail "POD Keycloak $KEYCLOAK_POD Status: $STATUS"
+        fi
+        ;;
+    6)
+        check_confluent
+        ;;
+     7)
+        msg "Check Klaw status"
+        KLAW_POD=$(kubectl get pods -n klaw -l app=klaw -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kubectl get pod $KLAW_POD -n klaw -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD Klaw $KLAW_POD Status: $STATUS"
+        else
+            msg_check_fail "POD Klaw $KLAW_POD Status: $STATUS"
+        fi
+        ;;
+     8)
+        msg "Check Karavan status"
+        KARAVAN_POD=$(kubectl get pods -n karavan -l app=karavan -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kubectl get pod $KARAVAN_POD -n karavan -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD Karavan $KARAVAN_POD Status: $STATUS"
+        else
+            msg_check_fail "POD Karavan $KARAVAN_POD Status: $STATUS"
+        fi
+        ;;
+     9)
+        msg "Check Solace status"
+        SOLACE_POD=$(kubectl get pods -n solace -l app=solace -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kubectl get pod $SOLACE_POD -n solace -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD Solace $SOLACE_POD Status: $STATUS"
+        else
+            msg_check_fail "POD Solace $SOLACE_POD Status: $STATUS"
+        fi
+        ;;
+     10)
+        msg "Check n8n status"
+        N8N_POD=$(kubectl get pods -n n8n -l app=n8n -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kub    ectl get pod $N8N_POD -n n8n -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD n8n $N8N_POD Status: $STATUS"
+        else
+            msg_check_fail "POD n8n $N8N_POD Status: $STATUS"
+        fi
+        ;;
+     11)
+        msg "Check Istio status"
+        istioctl verify-install --set profile=demo
+        ;;
+     12)
+        msg "Check Event Catalog status"
+        EVENT_CATALOG_POD=$(kubectl get pods -n event-catalog -l app=event-catalog -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kubectl get pod $EVENT_CATALOG_POD -n event-catalog -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD Event Catalog $EVENT_CATALOG_POD Status: $STATUS"
+        else
+            msg_check_fail "POD Event Catalog $EVENT_CATALOG_POD Status: $STATUS"
+        fi
+        ;;
+     13)
+        msg "Check Kafbat UI status"
+        KAFBAT_POD=$(kubectl get pods -n kafbat -l app=kafbat-ui -o jsonpath='{.items[0].metadata.name}')
+        STATUS=$(kubectl get pod $KAFBAT_POD -n kafbat -o jsonpath='{.status.phase}')
+        if [ "$STATUS" == "Running" ]; then
+            msg_check_success "POD Kafbat UI $KAFBAT_POD Status: $STATUS"
+        else
+            msg_check_fail "POD Kafbat UI $KAFBAT_POD Status: $STATUS"
+        fi
         ;;
     esac
 }
@@ -608,7 +696,7 @@ function port_forward() {
         kubectl port-forward svc/$SERVICE $PORT_FORWARD:$PORT &
         disown &>/dev/null
     fi
-    msg_check_success "Port forward iniciado para $SERVICE en puerto local $PORT_FORWARD al puerto remoto $PORT"
+    msg_check_success "Port forward iniciado para $SERVICE en puerto local $PORT_FORWARD al puerto remoto $PORT\n"
 }
 
 

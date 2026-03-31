@@ -20,6 +20,7 @@ source ./kubernetes/dashboard/install.sh
 source ./kubernetes/dashboard/uninstall.sh
 
 source ./kubernetes/activemq/install.sh
+source ./kubernetes/activemq/check.sh
 source ./kubernetes/activemq/uninstall.sh
 
 source ./kubernetes/linkerd/install.sh
@@ -29,6 +30,7 @@ source ./kubernetes/keycloak/install.sh
 source ./kubernetes/keycloak/uninstall.sh
 
 source ./kubernetes/confluent/install.sh
+source ./kubernetes/confluent/check.sh
 source ./kubernetes/confluent/uninstall.sh
 
 source ./kubernetes/camelk/install.sh

@@ -82,7 +82,7 @@ function spinner() {
     sleep .1
   done
   #msg_info "Process $pid finish        "
-  echo
+  #echo
   tput cnorm
   wait $pid # capture exit code
   return $?

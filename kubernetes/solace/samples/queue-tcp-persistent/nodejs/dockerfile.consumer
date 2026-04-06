@@ -1,0 +1,15 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copiamos los package desde la raíz (contexto actual)
+COPY package*.json ./
+RUN npm install
+
+# Copiamos TODO el contenido del contexto
+COPY . .
+
+# AJUSTE AQUÍ: 
+# Como el archivo está en 'samples/queue-tcp-persistent/consumer-queue-tcp.js'
+# dentro del contexto de construcción, ahí es donde quedará en el contenedor.
+CMD ["node", "consumer-queue-tcp.js"]

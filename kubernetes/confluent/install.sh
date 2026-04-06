@@ -5,6 +5,7 @@ function install_confluent() {
 	#  export TUTORIAL_HOME="https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/quickstart-deploy/kraft-quickstart"
 
 	NAMESPACE="confluent"
+	create_namespace $NAMESPACE
 
 	if ! command -v helm &>/dev/null; then
 		msg_warn "Helm could not be found, please install Helm before start."
@@ -18,13 +19,18 @@ function install_confluent() {
 		fi
 
 		if [ "$VERBOSE" -eq 0 ]; then
-			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes &>/dev/null
+			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes \
+				--namespace $NAMESPACE \
+				--set namespaced=false \
+				--set image.pullChecks.enabled=falses &>/dev/null
 		else
-			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes
+			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes \
+				--namespace $NAMESPACE \
+				--set namespaced=false \
+				--set image.pullChecks.enabled=false
 		fi
 	fi
 
-	create_namespace $NAMESPACE
 
 	if [ "$VERBOSE" -eq 1 ]; then
 		msg_info "Pods"

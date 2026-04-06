@@ -12,10 +12,11 @@ function uninstall_activemq() {
     kubectl get clusterroles -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep '^active-mq "' | xargs kubectl delete clusterrole
     kubectl get clusterrolebindings -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep '^active-mq "' | xargs kubectl delete clusterrolebinding
 
-    kamel uninstall
-    kubectl get pods,crds,subscriptions --all-namespaces | grep active-mq
+
+    msg_info "start delete custom resources definition (crds)"
+    kubectl get crd -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep 'active-mq' | xargs kubectl delete crd  &>/dev/null  & spinner  $! "Waiting delete crds"
+    kubectl get pods,subscriptions --all-namespaces | grep active-mq
 
     delete_namespace active-mq || echo "Namespace finalizer process not found"
-    kubectl delete namespace active-mq & spinner $! "Waiting delete namespace"
 
 }

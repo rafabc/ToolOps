@@ -1,0 +1,28 @@
+{
+  "$id": "order-created.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrderCreatedEvent",
+  "type": "object",
+  "required": ["orderId", "customerId", "amount", "currency", "createdAt"],
+  "properties": {
+    "orderId": {
+      "type": "string"
+    },
+    "customerId": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number",
+      "minimum": 0
+    },
+    "currency": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 3
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

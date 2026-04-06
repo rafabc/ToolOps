@@ -16,7 +16,11 @@ source ./scripts/builders/build-tool.sh
 source ./scripts/kubernetes.sh
 source ./scripts/spinner.sh
 
+source ./kubernetes/dashboard/install.sh
+source ./kubernetes/dashboard/uninstall.sh
+
 source ./kubernetes/activemq/install.sh
+source ./kubernetes/activemq/check.sh
 source ./kubernetes/activemq/uninstall.sh
 
 source ./kubernetes/linkerd/install.sh
@@ -26,6 +30,7 @@ source ./kubernetes/keycloak/install.sh
 source ./kubernetes/keycloak/uninstall.sh
 
 source ./kubernetes/confluent/install.sh
+source ./kubernetes/confluent/check.sh
 source ./kubernetes/confluent/uninstall.sh
 
 source ./kubernetes/camelk/install.sh
@@ -41,6 +46,7 @@ source ./kubernetes/redis/install.sh
 source ./kubernetes/redis/uninstall.sh
 
 source ./kubernetes/solace/install.sh
+source ./kubernetes/solace/check.sh
 source ./kubernetes/solace/uninstall.sh
 
 source ./kubernetes/n8n/install.sh
@@ -52,7 +58,8 @@ source ./kubernetes/istio/uninstall.sh
 source ./kubernetes/eventcatalog/install.sh
 source ./kubernetes/eventcatalog/uninstall.sh
 
-
+source ./kubernetes/kafbat-ui/install.sh
+source ./kubernetes/kafbat-ui/uninstall.sh
 
 
 if [[ "$1" == "-v" ]]; then

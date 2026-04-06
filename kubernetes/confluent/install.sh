@@ -19,13 +19,18 @@ function install_confluent() {
 		fi
 
 		if [ "$VERBOSE" -eq 0 ]; then
-			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes &>/dev/null
+			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes \
+				--namespace $NAMESPACE \
+				--set namespaced=false \
+				--set image.pullChecks.enabled=falses &>/dev/null
 		else
-			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes
+			helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes \
+				--namespace $NAMESPACE \
+				--set namespaced=false \
+				--set image.pullChecks.enabled=false
 		fi
 	fi
 
-	# create_namespace $NAMESPACE
 
 	if [ "$VERBOSE" -eq 1 ]; then
 		msg_info "Pods"

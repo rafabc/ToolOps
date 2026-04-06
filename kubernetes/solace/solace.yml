@@ -271,7 +271,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: solace  # Replace with your desired deployment name
+  name: solace
   labels:
     app: solace
 spec:
@@ -289,11 +289,11 @@ spec:
         image: solace/solace-pubsub-standard:10.25.13
         resources:
           requests:
-            cpu: 2000m  # Adjust CPU request if needed
-            memory: 6.0Gi  # Increase memory request to 2.5 GiB (or slightly higher)
+            cpu: 4000m  # Adjust CPU request if needed
+            memory: 8.0Gi  # Increase memory request to 2.5 GiB (or slightly higher)
           limits:
-            cpu: 3000m  # Adjust CPU limit if needed
-            memory: 6.0Gi
+            cpu: 4000m  # Adjust CPU limit if needed
+            memory: 8.0Gi
         volumeMounts:
            - mountPath: /dev/shm
              name: dshm
@@ -338,9 +338,17 @@ spec:
           - name: username_admin_password
             value: "admin"
           - name: system_scaling_maxconnectioncount
-            value: "1000"
+            value: "100"
           - name: storage_maxspoolusage
             value: "10000"
+          - name: system_scaling_maxkafkabridgecount
+            value: "10"
+          # - name: system_scaling_maxkafkabrokerconnectioncount
+          #   value: "10"
+          - name: system_scaling_maxbridgecount
+            value: "25"  
+          - name: messagespool_maxspoolusage
+            value: "15000"
         readinessProbe:
           httpGet:
             path: /
@@ -382,7 +390,8 @@ spec:
     targetPort: 9000
   selector:
     app: "solace"
-  type: "ClusterIP"      
+  type: "ClusterIP"     
+ 
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -398,3 +407,47 @@ spec:
     - namespaceSelector:
         matchLabels:
           name: karavan
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-confluent-to-solace
+#   namespace: solace
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: solace 
+#   policyTypes:
+#   - Ingress
+#   ingress:
+#   - from:
+#     - namespaceSelector:
+#         matchLabels:
+#           kubernetes.io/metadata.name: confluent
+#     ports:
+#     # - protocol: TCP
+#     #   port: 8080    # API SEMP / Manager
+#     - protocol: TCP
+#       port: 55555   # Protocolo SMF (Datos)
+#     - protocol: TCP
+#       port: 9000    # REST Messaging
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: solace-egress-to-confluent
+#   namespace: solace
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: solace
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - namespaceSelector:
+#         matchLabels:
+#           kubernetes.io/metadata.name: confluent
+#     ports:
+#     - protocol: TCP
+#       port: 9071 # Puerto de Kafka

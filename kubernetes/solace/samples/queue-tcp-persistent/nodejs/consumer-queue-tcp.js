@@ -6,12 +6,18 @@ solace.SolclientFactory.init({
     profile: solace.SolclientFactoryProfiles.version10,
 });
 
+
+const SOLACE_URL = process.env.SOLACE_URL || 'tcp://localhost:5555';
+
 const session = solace.SolclientFactory.createSession({
-    url: 'tcp://localhost:5555',
+    url: SOLACE_URL,
     vpnName: 'default',
-    userName: 'default',
-    password: 'default',
-    clientName: 'consumer-queue-nodejs',
+    userName: 'admin',
+    password: 'admin',
+    clientName: 'consumer-queue-garanted-tcp-smf',
+    transportProperties: {
+        noDelay: true // Deshabilita el algoritmo de Nagle para enviar paquetes lo antes posible
+    }
 });
 
 session.on(solace.SessionEventCode.UP_NOTICE, () => {
@@ -29,13 +35,23 @@ session.on(solace.SessionEventCode.UP_NOTICE, () => {
         console.error('❌ El consumidor no pudo conectarse a la cola:', error.toString());
     });
 
-    // consumer.on(solace.MessageConsumerEventName.UP_NOTICE, () => {
-    //     console.log('🚀 Consumidor está listo y escuchando la cola');
-    // });
 
-    // ✅ ÚNICO listener soportado
+
+    // ÚNICO listener soportado
     consumer.on(solace.MessageConsumerEventName.MESSAGE, (message) => {
-        console.log('← Mensaje recibido:', message.getBinaryAttachment()?.toString());
+
+        const ahora = new Date();
+
+        // Formato de hora completa con milisegundos
+        const horaLog = ahora.toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            fractionalSecondDigits: 3,
+            hour12: false
+        });
+
+        console.log(`[${horaLog}] 📨 Mensaje recibido ID: ${message.getApplicationMessageId()} - Contenido: ${message.getBinaryAttachment()?.toString()}`);
         message.acknowledge();
     });
 

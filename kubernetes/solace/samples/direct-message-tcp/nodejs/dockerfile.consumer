@@ -10,6 +10,6 @@ RUN npm install
 COPY . .
 
 # AJUSTE AQUÍ: 
-# Como el archivo está en 'samples/direct-message-tcp/producer-topic-tcp.js'
+# Como el archivo está en 'samples/direct-message-tcp/consumer-topic-tcp.js'
 # dentro del contexto de construcción, ahí es donde quedará en el contenedor.
-CMD ["node", "samples/direct-message-tcp/producer-topic-tcp.js"]
+CMD ["node", "consumer-topic-tcp.js"]

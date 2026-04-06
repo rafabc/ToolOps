@@ -5,10 +5,6 @@ function uninstall_confluent() {
     msg_info "Cambio a namespace confluent"
     kubectl config set-context --current --namespace=confluent &>/dev/null
 
-
-   # test2 & spinner  $!
-
-
     msg_info "start delete custom resources definition (crds)"
     kubectl get crd -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep 'confluent' | xargs kubectl delete crd  &>/dev/null  & spinner  $! "Waiting delete crds"
 
@@ -21,6 +17,5 @@ function uninstall_confluent() {
 
 
     delete_namespace confluent || echo "Namespace finalizer process not found"
-    kubectl delete namespace confluent  & spinner  $! "Waiting delete namespace"
 
 }

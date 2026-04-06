@@ -70,8 +70,3 @@ Consideraciones y buenas prácticas
 - Seguridad/configuración: no expongas credenciales en claro; parametriza URL, VPN, usuario y
   contraseña por variables de entorno o un archivo de configuración.
 
-Posibles mejoras
-
-- Añadir variables de entorno para `url`, `vpnName`, `userName`, `password` y `queueName`.
-- Añadir parsing JSON en payloads y `contentType` en los mensajes (`application/json`).
-- Añadir tests simples o un `package.json` con scripts `start:producer` y `start:consumer`.

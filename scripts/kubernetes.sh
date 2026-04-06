@@ -524,14 +524,7 @@ function kube_check() {
         fi
         ;;
      9)
-        msg "Check Solace status"
-        SOLACE_POD=$(kubectl get pods -n solace -l app=solace -o jsonpath='{.items[0].metadata.name}')
-        STATUS=$(kubectl get pod $SOLACE_POD -n solace -o jsonpath='{.status.phase}')
-        if [ "$STATUS" == "Running" ]; then
-            msg_check_success "POD Solace $SOLACE_POD Status: $STATUS"
-        else
-            msg_check_fail "POD Solace $SOLACE_POD Status: $STATUS"
-        fi
+        check_solace
         ;;
      10)
         msg "Check n8n status"
@@ -744,5 +737,165 @@ function wait_pod_running() {
         msg_check_fail "POD NOT READY" "$POD failed to reach ready state"
         kubectl get $POD
         return 1
+    fi
+}
+
+
+function check_pod_status() {
+    NAMESPACE=$1
+    POD_NAME=$2
+
+    msg "CHECKING POD" "$POD_NAME STATUS"
+    
+    # 1. Identificar el Pod
+    #POD=$(kubectl get pods -n "$NAMESPACE" -l "app=$POD_NAME" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+    POD=$(kubectl get pods -n "$NAMESPACE" --no-headers 2>/dev/null | grep "^$POD_NAME" | awk '{print $1}' | head -n 1)
+
+    if [ -z "$POD" ]; then
+        msg_error "No pod found for $POD_NAME in namespace $NAMESPACE"
+        return 1
+    fi
+
+    # 2. Extraer metadatos extendidos en una sola llamada (más eficiente)
+    JSON_DATA=$(kubectl get pod "$POD" -n "$NAMESPACE" -o json)
+    STATUS=$(echo "$JSON_DATA" | jq -r '.status.phase')
+    POD_IP=$(echo "$JSON_DATA" | jq -r '.status.podIP')
+    READY=$(echo "$JSON_DATA" | jq -r '.status.containerStatuses[0].ready')
+    RESTARTS=$(echo "$JSON_DATA" | jq -r '.status.containerStatuses[0].restartCount')
+    AGE=$(echo "$JSON_DATA" | jq -r '.metadata.creationTimestamp')
+    
+    # 3. Detectar si el último cierre fue por falta de memoria (OOMKill)
+    EXIT_REASON=$(echo "$JSON_DATA" | jq -r '.status.containerStatuses[0].lastState.terminated.reason // "None"')
+
+    # Formatear salida principal
+    MSG_STR="POD: $POD | Status: $STATUS | Ready: $READY | IP: $POD_IP"
+    
+    if [ "$STATUS" == "Running" ] && [ "$READY" == "true" ]; then
+        msg_check_success "$MSG_STR"
+        msg_check_success "AGE" "Created at: $AGE"
+        msg_check_success "RESTARTS" "Restart Count: $RESTARTS"
+    else
+        msg_check_fail "$MSG_STR"
+        [ "$EXIT_REASON" != "None" ] && msg_error "Last Termination Reason: $EXIT_REASON"
+        msg_info "pls check pod logs with: kubectl logs $POD -n $NAMESPACE"
+    fi
+
+    # 4. métricas de consumo
+    TOP_OUTPUT=$(kubectl top pod "$POD" -n "$NAMESPACE" --no-headers 2>/dev/null)
+    if [ -n "$TOP_OUTPUT" ]; then
+        msg_check_success "METRICS" "$TOP_OUTPUT"
+    else
+        msg_warn "Metrics not ready yet (wait 60s for Metric Server)"
+    fi
+
+    # 5. Modo Verbose: Solo eventos importantes (Warnings)
+    if [ "$VERBOSE" = "1" ] || [ "$VERBOSE" = "true" ]; then
+        msg_check_success "VERBOSE" "Recent Warning Events for $POD:"
+        # Filtramos solo por Warnings para no saturar la consola
+        WARNINGS=$(kubectl get events -n "$NAMESPACE" --field-selector involvedObject.name="$POD",type=Warning -o custom-columns=REASON:.reason,MESSAGE:.message --no-headers | head -n 5)
+        if [ -z "$WARNINGS" ]; then
+            msg_check_success "VERBOSE" "No warnings found in events."
+        else
+            msg_warn "WARNINGS" "$WARNINGS"
+        fi
+    fi
+}
+
+function check_svc_status() {
+    NAMESPACE=$1
+    SERVICE_NAME=$2
+    msg "CHECKING SERVICE" "$SERVICE_NAME STATUS"
+    SERVICE=$(kubectl get svc -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}')
+
+    if [ -z "$SERVICE" ]; then
+        msg_error "❌ No service found for $SERVICE_NAME in namespace $NAMESPACE"
+        return 1
+    else
+        msg_check_success "✅ Service $SERVICE_NAME found in namespace $NAMESPACE"
+    fi
+
+
+    ENDPOINTS=$(kubectl get endpoints $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.subsets[*].addresses[*].ip}')
+
+    if [ -z "$ENDPOINTS" ]; then
+        msg_check_fail "⚠️ El servicio existe pero NO tiene pods listos (0 Endpoints)"
+    else
+        msg_check_success "🚀 El servicio está activo y tiene endpoints en: $ENDPOINTS"
+    fi
+
+    EXTERNAL_IP=""
+    TIMEOUT=4
+    SECONDS_ELAPSED=0
+    SLEEP_INTERVAL=2
+
+
+    while [ -z "$EXTERNAL_IP" ]; do
+        # Intentamos obtener tanto hostname como ip (por si usas AWS o Bare Metal/GCP)
+        EXTERNAL_IP=$(kubectl get svc "$SERVICE_NAME" -n "$NAMESPACE" -o jsonpath='{.status.loadBalancer.ingress[0].hostname}{.status.loadBalancer.ingress[0].ip}')
+        
+        if [ -z "$EXTERNAL_IP" ]; then
+            if [ "$SECONDS_ELAPSED" -ge "$TIMEOUT" ]; then
+                msg_warn "Timeout: Service $SERVICE_NAME does not have an External IP after ${TIMEOUT}s"
+                break
+            fi
+            
+            sleep "$SLEEP_INTERVAL"
+            ((SECONDS_ELAPSED+=SLEEP_INTERVAL))
+        else 
+            msg_check_success "🌐 External IP found: $EXTERNAL_IP"
+        fi
+    done
+
+    if [ "$VERBOSE" = "1" ] || [ "$VERBOSE" = "true" ]; then
+        kubectl get svc $SERVICE -n $NAMESPACE
+    fi
+}
+
+
+
+function check_pvc_status() {
+    local NAMESPACE=$1
+    local PVC_NAME=$2
+    # Ajustado para alinear con el texto después de [INFO]
+    local INDENT="                   " 
+
+    msg "CHECKING PVC" "$PVC_NAME STATUS"
+
+    PVC=$(kubectl get pvc -n "$NAMESPACE" --no-headers 2>/dev/null | grep "$PVC_NAME" | awk '{print $1}' | head -n 1)
+
+    if [ -z "$PVC" ]; then
+        msg_error "❌ No PVC found for $PVC_NAME in namespace $NAMESPACE"
+        return 1
+    else
+        msg_check_success "✅ PVC $PVC found in namespace $NAMESPACE"
+    fi
+
+    STATUS=$(kubectl get pvc "$PVC" -n "$NAMESPACE" -o jsonpath='{.status.phase}')
+
+    if [ "$STATUS" == "Bound" ]; then
+        msg_check_success "🚀 PVC is Bound and ready to use"
+    else
+        msg_check_fail "PVC is in status: $STATUS"        
+        msg_info "📋 Kubernetes Describe Output:"
+        kubectl describe pvc "$PVC" -n "$NAMESPACE" | sed "s/^/$INDENT/"
+
+        msg_info "📌 Recent Events:"
+        kubectl get events -n "$NAMESPACE" \
+            --field-selector involvedObject.name="$PVC" \
+            --sort-by=.metadata.creationTimestamp | sed "s/^/$INDENT/"
+
+        msg_info "📦 StorageClass details:"
+        SC=$(kubectl get pvc "$PVC" -n "$NAMESPACE" -o jsonpath='{.spec.storageClassName}')
+        msg_info_idented "StorageClass: $SC"
+        if [ -n "$SC" ]; then
+            kubectl describe storageclass "$SC" 2>/dev/null | sed "s/^/$INDENT/" || echo "${INDENT}Error: StorageClass '$SC' not found."
+        else
+            msg_warn "⚠️ No StorageClass defined for this PVC"
+        fi
+    fi
+
+    if [ "$VERBOSE" = "1" ] || [ "$VERBOSE" = "true" ]; then
+        msg "YAML VIEW" "Full manifest for $PVC"
+        kubectl get pvc "$PVC" -n "$NAMESPACE" -o yaml | sed "s/^/$INDENT/"
     fi
 }

@@ -46,6 +46,7 @@ source ./kubernetes/redis/install.sh
 source ./kubernetes/redis/uninstall.sh
 
 source ./kubernetes/solace/install.sh
+source ./kubernetes/solace/check.sh
 source ./kubernetes/solace/uninstall.sh
 
 source ./kubernetes/n8n/install.sh

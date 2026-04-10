@@ -2,12 +2,13 @@
 
 function uninstall_keycloak() {
 
+    NAMESPACE="keycloak"
 
-    msg "Cambio a namespace keycloak"
-    kubectl config set-context --current --namespace=keycloak &>/dev/null
-    kubectl delete -f keycloak.yml # &>/dev/null
+    delete_resources $NAMESPACE keycloak.yml
+    echo
+    delete_namespace $NAMESPACE || echo "Namespace finalizer process not found"
+    
+    delete_port_forward keycloak
 
-    delete_namespace keycloak || echo "Namespace finalizer process not found"
-    kubectl delete namespace keycloak  & spinner  $! "Waiting delete namespace"
 
 }

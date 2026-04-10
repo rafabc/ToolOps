@@ -20,7 +20,7 @@ function spinner() {
   local msg=$2
 
   #case $(($RANDOM % 12)) in
-  case $((10)) in
+  case $((11)) in
   0)
     local spin='⠁⠂⠄⡀⢀⠠⠐⠈'
     local charwidth=3

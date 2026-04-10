@@ -5,9 +5,7 @@ function install_camelk() {
     create_namespace "camel-k"
 
     install_kamel_client
-
     install_registry
-
     install_camelk_operator
 
     apply_resources "camelk.yml"
@@ -29,7 +27,7 @@ function install_camelk() {
 
 
 function install_kamel_client() {
-    msg "Cheking requirements"
+    msg "Cheking requirements (kamel client only available for MacOS with Homebrew)"
     if brew list | grep kamel &>/dev/null; then
         msg_check_success "Cliente Camel K (kamel) se encuentra disponible en el sistema"
     else

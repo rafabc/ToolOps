@@ -11,12 +11,22 @@ source ./scripts/setup-semver.sh
 source ./scripts/yarn.sh
 source ./scripts/git.sh
 source ./scripts/builders/build-tool.sh
+source ./scripts/spinner.sh
 
 
 source ./scripts/kubernetes.sh
-source ./scripts/spinner.sh
+source ./scripts/kubernetes/create-namespace.sh
+source ./scripts/kubernetes/delete-namespace.sh
+source ./scripts/kubernetes/delete-resources.sh
+source ./scripts/kubernetes/check-pvc-status.sh
+source ./scripts/kubernetes/check-pod-status.sh
+source ./scripts/kubernetes/check-svc-status.sh
+source ./scripts/kubernetes/create-port-forward.sh
+source ./scripts/kubernetes/delete-port-forward.sh
+source ./scripts/kubernetes/wait-pod-running.sh
 
 source ./kubernetes/dashboard/install.sh
+source ./kubernetes/dashboard/check.sh
 source ./kubernetes/dashboard/uninstall.sh
 
 source ./kubernetes/activemq/install.sh

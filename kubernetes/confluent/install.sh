@@ -41,4 +41,9 @@ function install_confluent() {
 
 	port_forward "9021" "9021" controlcenter
 
+	port_forward "9092" "9092" kafka-0-internal
+	port_forward "9093" "9092" kafka-1-internal
+	port_forward "9094" "9092" kafka-2-internal
+	
+
 }

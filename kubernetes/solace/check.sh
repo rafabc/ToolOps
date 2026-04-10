@@ -4,6 +4,7 @@
 
 function check_solace() {
 
+    clear
     NAMESPACE="solace"
 
     msg_task "Checking $NAMESPACE Status"

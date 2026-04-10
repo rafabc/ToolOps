@@ -391,9 +391,9 @@ plugins:
   resources:
   - id: diw76klraeu
     type: solace
-    name: IRIS
+    name: SOL_BROKER
     connections:
-    - name: IRIS
+    - name: SOL_BROKER
       url: http://solace.solace.svc.cluster.local:8080
       properties:
       - name: msgVpn
@@ -419,7 +419,7 @@ plugins:
 **Explicación**:
 - `id: diw76klraeu`: Identificador único del plugin
 - `type: solace`: Tipo de plugin (Solace broker)
-- `name: IRIS`: Nombre amigable del broker
+- `name: SOL_BROKER`: Nombre del broker
 - `url`: Dirección de Solace dentro del cluster Kubernetes
 - `msgVpn: default`: Virtual Private Network por defecto
 - `sempPageSize: 100`: Tamaño de página para API SEMP (número de elementos por página)

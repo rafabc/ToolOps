@@ -18,8 +18,7 @@ spec:
     spec:
       containers:
       - name: producer
-        #image: producer-queue-garanted-tcp-smf:latest
-        image: artifactory.globaldevtools.bbva.com/cib-eyfw-docker-local/iris/producer-queue-garanted-tcp-smf:1.0.1
+        image: producer-queue-garanted-tcp-smf:latest
         imagePullPolicy: IfNotPresent
         env:
           - name: SOLACE_URL

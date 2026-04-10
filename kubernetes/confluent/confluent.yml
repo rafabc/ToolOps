@@ -46,6 +46,19 @@ spec:
     kRaftController:
       clusterRef:
         name: kraftcontroller
+  listeners:
+      external:
+        externalAccess:
+          type: nodePort
+          nodePort:
+            host: localhost
+            nodePortOffset: 30000
+  # configOverrides:
+  #   server:
+  #     - advertised.listeners=EXTERNAL://localhost:9092,INTERNAL://kafka.confluent.svc.cluster.local:9071
+  #     # IMPORTANTE: Mapear todos los nombres de listener a un protocolo (PLAINTEXT)
+  #     - listener.security.protocol.map=EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT,REPLICATION:PLAINTEXT,CONTROLLER:PLAINTEXT
+  #     - inter.broker.listener.name=INTERNAL
 # ---
 # apiVersion: platform.confluent.io/v1beta1
 # kind: Connect
@@ -159,46 +172,45 @@ spec:
   #     value: "3"
   #   - name: CONFLUENT_METRICS_TOPIC_REPLICATION 
   #     value: "3"
-
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-solace-to-kafka
-  namespace: confluent
-spec:
-  podSelector:
-    matchLabels:
-      app: kafka # Asegúrate que coincida con el label de tus pods de Kafka
-  ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: solace
-    ports:
-    - protocol: TCP
-      port: 9071
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: confluent-egress-to-solace
-  namespace: confluent
-spec:
-  podSelector:
-    matchLabels:
-      platform.confluent.io/type: kafka # Ajusta según el label real de tus pods de confluent
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: solace
-    ports:
-    - protocol: TCP
-      port: 8080    # SEMP (Gestión)
-    - protocol: TCP
-      port: 55555   # SMF (Datos Solace)
-    - protocol: TCP
-      port: 9000    # REST Messaging
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-solace-to-kafka
+#   namespace: confluent
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: kafka # Asegúrate que coincida con el label de tus pods de Kafka
+#   ingress:
+#   - from:
+#     - namespaceSelector:
+#         matchLabels:
+#           kubernetes.io/metadata.name: solace
+#     ports:
+#     - protocol: TCP
+#       port: 9071
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: confluent-egress-to-solace
+#   namespace: confluent
+# spec:
+#   podSelector:
+#     matchLabels:
+#       platform.confluent.io/type: kafka # Ajusta según el label real de tus pods de confluent
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - namespaceSelector:
+#         matchLabels:
+#           kubernetes.io/metadata.name: solace
+#     ports:
+#     - protocol: TCP
+#       port: 8080    # SEMP (Gestión)
+#     - protocol: TCP
+#       port: 55555   # SMF (Datos Solace)
+#     - protocol: TCP
+#       port: 9000    # REST Messaging

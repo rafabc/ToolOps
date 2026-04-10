@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: camel-k
-  labels:
-    kubernetes.io/metadata.name: camel-k

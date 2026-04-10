@@ -46,13 +46,13 @@ function check_pipeline_status() {
 	echo "PREPARING CHECK STATUS: ${RUNID} IN PIPE ${PIPEID}"
 
 
-	while [[ "$(curl -s --location --request GET https://dev.azure.com/${ACCOUNT}/${PROJECT}/_apis/pipelines/${PIPEID}/runs/$RUNID --header 'Authorization: Basic cmFmYWVsLmJsYW5jb0BpbmV0dW0uY29tOjR0ZzRwd20za3o2bW53ZzRqZ2ZsNjQ1azNqMnkzdjdscHh6dnVhdnA2ZXNneHBtemNybXE=' | jq '.result')" == null ]]
+	while [[ "$(curl -s --location --request GET https://dev.azure.com/${ACCOUNT}/${PROJECT}/_apis/pipelines/${PIPEID}/runs/$RUNID --header 'Authorization: Basic cmFmYWVsLmJsYW5jb0BpbmV0dW0uY29tOjR0ZzRwd20za3o2bW53ZzRqZ2ZsNj****' | jq '.result')" == null ]]
 	do
 		sleep 3
 		printf '\r%s                      ' "Checking status - wait for finish deploy"
 	done
 
-	RESPONSE=$(curl -s --location --request GET https://dev.azure.com/${ACCOUNT}/${PROJECT}/_apis/pipelines/${PIPEID}/runs/$RUNID --header 'Authorization: Basic cmFmYWVsLmJsYW5jb0BpbmV0dW0uY29tOjR0ZzRwd20za3o2bW53ZzRqZ2ZsNjQ1azNqMnkzdjdscHh6dnVhdnA2ZXNneHBtemNybXE=')
+	RESPONSE=$(curl -s --location --request GET https://dev.azure.com/${ACCOUNT}/${PROJECT}/_apis/pipelines/${PIPEID}/runs/$RUNID --header 'Authorization: Basic cmFmYWVsLmJsYW5jb0BpbmV0dW0uY29tOjR0ZzRwd20za3o2bW53Z***')
 	status=$(jq -r '.state' <<< ${RESPONSE})
 	result=$(jq -r '.result' <<< ${RESPONSE})
 	echo ""

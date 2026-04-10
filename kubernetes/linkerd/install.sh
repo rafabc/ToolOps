@@ -15,6 +15,7 @@ function install_linkerd() {
 
     #INSTALL LINKERD
     msg_task "Install linkerd"
+    kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
     linkerd install --crds | kubectl apply -f -
     linkerd install --set proxyInit.runAsRoot=true | kubectl apply -f -
     check_operation $? "Linkerd installed"

@@ -10,7 +10,7 @@ const consumer = kafka.consumer({ groupId: 'grupo-demo' });
 const run = async () => {
   await consumer.connect();
   await consumer.subscribe({
-    topic: 'topic-demo-particiones',
+    topic: 'orders-topic',
     fromBeginning: true // cambia a false si no quieres leer mensajes antiguos
   });
 

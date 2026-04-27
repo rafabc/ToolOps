@@ -39,11 +39,25 @@ function install_confluent() {
 
 	apply_resources "confluent.yml"
 
+	wait_pod_running "kraftcontroller-0"
+
+	wait_pod_running "kafka-0"
+
+	wait_pod_running "controlcenter-0"
+
 	port_forward "9021" "9021" controlcenter
 
 	port_forward "9092" "9092" kafka-0-internal
 	port_forward "9093" "9092" kafka-1-internal
 	port_forward "9094" "9092" kafka-2-internal
+
+	port_forward "8082" "8082" kafkarestproxy-0-internal
+	
+	port_forward "8088" "8088" ksqldb-0-internal
+
+	port_forward "8081" "8081" schemaregistry-0-internal
+
+	port_forward "8083" "8083" connect-0-internal
 	
 
 }

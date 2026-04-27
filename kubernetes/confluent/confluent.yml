@@ -16,7 +16,7 @@ metadata:
   name: kraftcontroller
   namespace: confluent
 spec:
-  dataVolumeCapacity: 10G
+  dataVolumeCapacity: 10Gi
   storageClass:
     name: hostpath
   image:
@@ -59,57 +59,64 @@ spec:
   #     # IMPORTANTE: Mapear todos los nombres de listener a un protocolo (PLAINTEXT)
   #     - listener.security.protocol.map=EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT,REPLICATION:PLAINTEXT,CONTROLLER:PLAINTEXT
   #     - inter.broker.listener.name=INTERNAL
-# ---
-# apiVersion: platform.confluent.io/v1beta1
-# kind: Connect
-# metadata:
-#   name: connect
-#   namespace: confluent
-# spec:
-#   replicas: 1
-#   image:
-#     application: confluentinc/cp-server-connect:7.6.0
-#     init: confluentinc/confluent-init-container:2.8.0
-#   dependencies:
-#     kafka:
-#       bootstrapEndpoint: kafka:9071
-# ---
-# apiVersion: platform.confluent.io/v1beta1
-# kind: KsqlDB
-# metadata:
-#   name: ksqldb
-#   namespace: confluent
-# spec:
-#   replicas: 1
-#   image:
-#     application: confluentinc/cp-ksqldb-server:7.6.0
-#     init: confluentinc/confluent-init-container:2.8.0
-#   dataVolumeCapacity: 10Gi
-# ---
-# apiVersion: platform.confluent.io/v1beta1
-# kind: SchemaRegistry
-# metadata:
-#   name: schemaregistry
-#   namespace: confluent
-# spec:
-#   replicas: 1
-#   image:
-#     application: confluentinc/cp-schema-registry:7.6.0
-#     init: confluentinc/confluent-init-container:2.8.0
-# ---
-# apiVersion: platform.confluent.io/v1beta1
-# kind: KafkaRestProxy
-# metadata:
-#   name: kafkarestproxy
-#   namespace: confluent
-# spec:
-#   replicas: 1
-#   image:
-#     application: confluentinc/cp-kafka-rest:7.6.0
-#     init: confluentinc/confluent-init-container:2.8.0
-#   dependencies:
-#     schemaRegistry:
-#       url: http://schemaregistry.confluent.svc.cluster.local:8081
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Connect
+metadata:
+  name: connect
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-server-connect:7.6.0
+    init: confluentinc/confluent-init-container:2.8.0
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka:9071
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: KsqlDB
+metadata:
+  name: ksqldb
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-ksqldb-server:8.1.2
+    init: confluentinc/confluent-init-container:2.8.0
+  dataVolumeCapacity: 10Gi
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: SchemaRegistry
+metadata:
+  name: schemaregistry
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-schema-registry:7.6.0
+    init: confluentinc/confluent-init-container:2.8.0
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: KafkaRestProxy
+metadata:
+  name: kafkarestproxy
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-kafka-rest:8.1.2
+    init: confluentinc/confluent-init-container:2.8.0
+  # resources:
+  #     requests:
+  #       cpu: 500m
+  #       memory: 1Gi
+  #     limits:
+  #       cpu: 1000m
+  #       memory: 2Gi
+  dependencies:
+    schemaRegistry:
+      url: http://schemaregistry.confluent.svc.cluster.local:8081
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: ControlCenter
@@ -122,17 +129,17 @@ spec:
     application: confluentinc/cp-enterprise-control-center-next-gen:2.4.1
     init: confluentinc/confluent-init-container:3.2.1
   dataVolumeCapacity: 10Gi
-  # dependencies:
-  #   kafka:
-  #     url: tcp://kafka.confluent.svc.cluster.local:9071
-  #   schemaregistry:
-  #     url: http://schemaregistry.confluent.svc.cluster.local:8081
-  #   ksqldb:
-  #   - name: ksqldb
-  #     url: http://ksqldb.confluent.svc.cluster.local:8088
-  #   connect:
-  #   - name: connect
-  #     url: http://connect.confluent.svc.cluster.local:8083
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka:9071
+    connect:
+      - name: connect
+        url: http://connect.confluent.svc.cluster.local:8083
+    schemaRegistry:
+      url: http://schemaregistry.confluent.svc.cluster.local:8081
+    ksqldb:
+      - name: ksqldb
+        url: http://ksqldb.confluent.svc.cluster.local:8088
   configOverrides:
       server:
         - auto.create.topics.enable=true
@@ -148,30 +155,6 @@ spec:
         #- offsets.topic.replication.factor=1
         #- transaction.state.log.replication.factor=1
         #- transaction.state.log.min.isr=1
-
-  # env:
-  #   - name: confluent.controlcenter.command.topic.replication
-  #     value: "3"
-  #   - name: confluent.controlcenter.command.topic
-  #     value: "_confluent-command"
-  #   - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
-  #     value: "kafka:9092"
-  #   - name: CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER
-  #     value: "connect:8083"
-  #   - name: CONTROL_CENTER_KSQL_KSQLDB1_URL
-  #     value: "http://ksqldb-server:8088"
-  #   - name: CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL
-  #     value: "http://localhost:8088"
-  #   - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL  
-  #     value: "http://schema-registry:8081"
-  #   - name: CONTROL_CENTER_REPLICATION_FACTOR
-  #     value: "3"    
-  #   - name: CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS
-  #     value: "3"
-  #   - name: CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS  
-  #     value: "3"
-  #   - name: CONFLUENT_METRICS_TOPIC_REPLICATION 
-  #     value: "3"
 # ---
 # apiVersion: networking.k8s.io/v1
 # kind: NetworkPolicy
@@ -181,7 +164,7 @@ spec:
 # spec:
 #   podSelector:
 #     matchLabels:
-#       app: kafka # Asegúrate que coincida con el label de tus pods de Kafka
+#       app: kafka
 #   ingress:
 #   - from:
 #     - namespaceSelector:

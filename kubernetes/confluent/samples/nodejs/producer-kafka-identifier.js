@@ -8,9 +8,9 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 const admin = kafka.admin();
 
-const TOTAL_MESSAGES = 1_000_000;
-const BATCH_SIZE = 500;          // ajusta según rendimiento
-const DELAY_MS = 50;            // delay entre batches
+const TOTAL_MESSAGES = 1_000_000_000;
+const BATCH_SIZE = 500;          
+const DELAY_MS = 50;
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -47,7 +47,7 @@ const run = async () => {
                 };
 
                 messages.push({
-                    key: String(1),
+                    key: String(event.id),
                     value: JSON.stringify(event),
                 });
             }

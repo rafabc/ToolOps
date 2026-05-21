@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "node-rdkafka": "^2.11.0"
   }
 }

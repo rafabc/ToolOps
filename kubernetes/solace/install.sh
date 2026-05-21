@@ -21,7 +21,7 @@ function install_solace() {
     port_forward "5555" "55555" solace
 
 
-
+    #INSTALL SOLACE SCHEMA REGISTRY
     cd solace-schema-registry
     apply_resources "solace-schema-registry.yml"
     msg "Waiting for Solace Schema Registry pods to be running..."

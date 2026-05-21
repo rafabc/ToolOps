@@ -3,24 +3,7 @@
 function uninstall_solace() {
 
     NAMESPACE="solace"
-
-    # Comprueba si el namespace existe usando el comando "kubectl get namespace"
-    msg_info "Cambio a namespace $NAMESPACE"
-    kubectl get namespace "$NAMESPACE" &>/dev/null
-
-    # Si el comando no devuelve un error, el namespace existe
-    if [ $? -eq 0 ]; then
-        kubectl config set-context --current --namespace=$NAMESPACE &>/dev/null
-    else
-        msg_warn_idented "Namespace $NAMESPACE no existe - se continua el proceso de borrado"
-    fi
-
-
-    msg_info "start delete custom resources definition (crds)"
-    kubectl get crd -o=jsonpath='{range .items[*]}{@.metadata.name}{"\n"}{end}' | grep 'solace' | xargs kubectl delete crd  &>/dev/null  & spinner  $! "Waiting delete crds"
-
-    msg_info "start delete solace.yml"
-    kubectl delete -f solace.yml  &>/dev/null & spinner  $! "Waiting delete solace.yml"
+    delete_resources $NAMESPACE solace.yml
 
     msg_info "start delete solace-schema-registry.yml"
     kubectl delete -f ./solace-schema-registry/solace-schema-registry.yml  &>/dev/null & spinner  $! "Waiting delete solace-schema-registry.yml"

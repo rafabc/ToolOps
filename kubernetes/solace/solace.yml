@@ -14,47 +14,48 @@ data:
     server:
       port: 8180
     spring:
-      servlet:
-        multipart:
-          max-file-size: ${MAX_FILE_SIZE:5MB}
-          max-request-size: ${MAX_REQUEST_SIZE:5MB}
-      datasource:
-        url: jdbc:h2:file:./data/cache;DB_CLOSE_ON_EXIT=FALSE
-        username: sa
-        driver-class-name: org.h2.Driver
-        password: 7mauFTCZJ3
-      jpa:
-        hibernate:
-          ddl-auto: create-drop
-        defer-datasource-initialization: true
       main:
         allow-bean-definition-overriding: true
+      jpa:
+        defer-datasource-initialization: true
+        hibernate:
+          ddl-auto: create-drop
+      datasource:
+        password: y0QTTPSawz
+        driver-class-name: org.h2.Driver
+        username: sa
+        url: jdbc:h2:file:./data/cache;DB_CLOSE_ON_EXIT=FALSE
+      servlet:
+        multipart:
+          max-request-size: ${MAX_REQUEST_SIZE:5MB}
+          max-file-size: ${MAX_FILE_SIZE:5MB}
     camel:
       main:
         use-mdc-logging: true
     kafka:
       client:
         config:
-          reconnections:
-            max-backoff:
-              value: 1000
-              unit: milliseconds
-            backoff:
-              value: 50
-              unit: milliseconds
           connections:
             max-idle:
+              unit: milliseconds
               value: 10000
-              unit: milliseconds
             request-timeout:
+              unit: milliseconds
               value: 5000
-              unit: milliseconds
             timeout:
-              value: 60000
               unit: milliseconds
+              value: 60000
+          reconnections:
+            max-backoff:
+              unit: milliseconds
+              value: 1000
+            backoff:
+              unit: milliseconds
+              value: 50
     eventPortal:
-      organizationId: ${EP_ORGANIZATION_ID:0o7cua87oz4}
       runtimeAgentId: ${EP_RUNTIME_AGENT_ID:aax11tpdxqr}
+      organizationId: ${EP_ORGANIZATION_ID:0o7cua87oz4}
+      topicPrefix: ${EP_TOPIC_PREFIX:sc/ep/runtime}
       gateway:
         id: g527g4hnak7
         name: US East EVMR
@@ -65,25 +66,24 @@ data:
           testHeartbeats: true
           connections:
           - name: eventPortalGateway
-            url: ${EP_GATEWAY_URL:tcps://prod-us-evmr.messaging.solace.cloud:55443}
             authenticationType: ${EP_GATEWAY_AUTH:basicAuthentication}
             msgVpn: ${EP_GATEWAY_MSGVPN:us-east-evmr}
+            url: ${EP_GATEWAY_URL:tcps://prod-us-evmr.messaging.solace.cloud:55443}
             ssl:
               trustStore: /etc/ssl/certs/solace.crt
               trustStoreType: PEM
               validateCertificate: false
             users:
-            - clientName: client_aax11tpdxqr
-              username: ${EP_GATEWAY_USERNAME:org-0o7cua87oz4-b2dpd4apk26-aax11tpdxqr}
+            - name: messaging1
               password: B6zDufV5-JaBeZD^1vt8^bi}
-              name: messaging1
+              username: ${EP_GATEWAY_USERNAME:org-0o7cua87oz4-b2dpd4apk26-aax11tpdxqr}
+              clientName: client_aax11tpdxqr
             proxyEnabled: ${SOLACE_PROXY_ENABLED:false}
             proxyType: ${SOLACE_PROXY_TYPE:http}
             proxyHost: ${SOLACE_PROXY_HOST:localhost}
             proxyPort: ${SOLACE_PROXY_PORT:8443}
             proxyUsername: ${SOLACE_PROXY_USERNAME:}
             proxyPassword: ${SOLACE_PROXY_PASSWORD:}
-      topicPrefix: ${EP_TOPIC_PREFIX:sc/ep/runtime}
     plugins:
       resources:
       - id: diw76klraeu
@@ -91,16 +91,16 @@ data:
         name: IRIS
         connections:
         - name: IRIS
-          url: http://solace.solace.svc.cluster.local:8080
+          url: https://console.solace.cloud:943
           properties:
-          - name: msgVpn
-            value: default
-          - name: sempPageSize
-            value: 100
+          - value: default
+            name: msgVpn
+          - value: 100
+            name: sempPageSize
           authentication:
           - properties:
-            - name: type
-              value: basicAuthentication
+            - value: basicAuthentication
+              name: type
             protocol: semp
             credentials:
             - source: ENVIRONMENT_VARIABLE
@@ -111,7 +111,10 @@ data:
                 value: admin
               - name: password
                 value: admin
+              
 ---
+# Para obtener el certificado completo de Solace Cloud, se puede usar el siguiente comando:
+#openssl s_client -showcerts -connect prod-us-evmr.messaging.solace.cloud:55443 </dev/null 2>/dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /Volumes/PROJECTS/KYNDRYL/ToolOps/kubernetes/solace/solace_full_chain.crt
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -120,33 +123,33 @@ metadata:
 data:
   solace.crt: |
     -----BEGIN CERTIFICATE-----
-    MIIE8zCCAtugAwIBAgIQfnb3UaWdoEnDSsJ7KDH0czANBgkqhkiG9w0BAQsFADBa
+    MIIE8zCCAtugAwIBAgIQQlpbSKc8TuJZlYafQQXtdjANBgkqhkiG9w0BAQsFADBa
     MQswCQYDVQQGEwJVUzERMA8GA1UECAwITmV3IFlvcmsxETAPBgNVBAcMCE5ldyBZ
-    b3JrMSUwIwYDVQQDDBxLeW5kcnlsLUZvcndhcmQtVHJ1c3QtUlNBLXYyMB4XDTI1
-    MDIyMDAwMDAwMFoXDTI2MDMyMzIzNTk1OVowcDELMAkGA1UEBhMCQ0ExEDAOBgNV
+    b3JrMSUwIwYDVQQDDBxLeW5kcnlsLUZvcndhcmQtVHJ1c3QtUlNBLXYyMB4XDTI2
+    MDIxODAwMDAwMFoXDTI3MDIyMDIzNTk1OVowcDELMAkGA1UEBhMCQ0ExEDAOBgNV
     BAgTB09udGFyaW8xDzANBgNVBAcTBkthbmF0YTEbMBkGA1UEChMSU29sYWNlIENv
     cnBvcmF0aW9uMSEwHwYDVQQDDBgqLm1lc3NhZ2luZy5zb2xhY2UuY2xvdWQwggEi
-    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC+4mJIUeQo0pxzgcVFg5dXFnIn
-    +3iUjD1a74KH1qoQ1tFPy2fC3/KpIWrvwpgRRuXPOuHprhnVTHZ10r6/1W585frd
-    dlrI8Dx5qHBb6dGlmOaFZIOoy+fOLOb1OX7/17aZ/DcoUmoEPKBF8jjRJ/8K3b7I
-    RNTqWbWzay7t7wxJLy2h40XspVFwfydA5giuvxBV48wqvameBK1ruJjYWNlP6C3m
-    jADZUnF6P/Kaw+uPQlDLt8Je2MJi53OELDNRPxBnTXihngTv9Mv/Ea2COH6oSBRb
-    Myy/W7dJAxzs05nrN3l0gsy5E84RgKwQ8d7ufpLeSt7QPy30ARoGGwYReAptAgMB
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDCK3SjxEvCoPKFa19LmJpJvj6y
+    Cgy0ya+PlkCJjWH06pEyNSUWXqsp1bvgaWJaArxSHwNnCSOF/ElKsjcj60kNKQRV
+    OvoSBQ264OKXxIQ5uaCu9vZ4cS1I9apeiQDbwytCWAT2+9uzuN+4M9u9fGVwLj4P
+    Yllfkm7G18xqxqtTnRFC0CHqCTToEqW5XRL3laEoWYkxfJq5qbMz0oKVQTSNUEqX
+    ab5oO/TWw9MLyg86xSskfSiHoVb6CW9okEQ1EpOUmHGbgHJ88/GJXIwl3DfHab4f
+    XM7mdARabRBS1MiSMXD0+C5+OAd7GR6jGyxOTK5PN7+ZL1BAyefj3E3oJPlrAgMB
     AAGjgZ4wgZswDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCAaAwFgYDVR0lAQH/
-    BAwwCgYIKwYBBQUHAwEwHQYDVR0OBBYEFPAq0uB3JwU3OnaCEk8y5gJec3q6MCMG
+    BAwwCgYIKwYBBQUHAwEwHQYDVR0OBBYEFDKs/QVRDD/DVYnPrRNeC6PDuYG/MCMG
     A1UdEQQcMBqCGCoubWVzc2FnaW5nLnNvbGFjZS5jbG91ZDAfBgNVHSMEGDAWgBTf
-    5jud6w+hHsOIYs7FAi2jfIJ+fzANBgkqhkiG9w0BAQsFAAOCAgEAMxjHXGrF3gq3
-    hfk5c2YyZnCq3/L3JHiIhpt9+UIEXjX/MeIhAvp6PIe634aPTDAWxWtL1OmhrbbL
-    oF+Sg5m1aMtAxf3DyfGhC5lZuB5ExqtJmiFDmf46hzgBEUiGWRIQF4O5AQ0U2/L0
-    yP/mDUpIBIb8NY2HIDTOJx62J7LHGAxlqFEZ9cmqDZQcgu44tJUS8GBtvjv5bBZQ
-    8siVsmN6usdGbhYGX2WVdjri9o3FzRRNxLrfnDTIw59LPo/F60rotZ+x9neN9GiX
-    +QdsWp3n0efJB8juq97F74Wf+mFYNcelF2dQVASt6VUxNa5TPxYXiDsy5FKhmJmT
-    KupTDMxW3Sj3N5WnOHmxN2fXY7tpQ0Q4IV0d5ZPxrkksN98JbYEtWGg5tNYHOTuY
-    LqCT+Yl+8XdB2FmpVboSsPdT6UhtPdKV5vbYIpw++hqCY0hhMAlKhvUox8b5FNC7
-    DYf+jU+pgKKVrGB4xgaK8xQxrabO4l3LyldzJVIChneiowGt00C30QyNoCVWxIuD
-    zGHZk9GR/KEDxA9md/eU9DkJKkpBoauC5+OWujdwuQcneOqAENVaG7mEREcFlDrM
-    iEJuAwUSTPkiq1e6iRe9w0aX4QJrGJJZ2gyr05g7XDaE2fG5ll6ntlecJ3yBjsdG
-    OqPAefdtlbBwKPrfNNYSvvNQWJ/G7QM=
+    5jud6w+hHsOIYs7FAi2jfIJ+fzANBgkqhkiG9w0BAQsFAAOCAgEADVHg5HHJE3Ts
+    EW6HJalCyDZHV7zTgXpZg1e+SKa1rrXSVRdo8L30fMzy6DQ0yjm6BVC23OB+4w4N
+    fkwUU/bB9fxsJ22zTjOAgL7ktvAfn5iledIegpKG9smSzr9QIrFXQScWRMKEA+3p
+    ZwQBXzET19hRVbYCMuBmcbAgzJXMEAGMM8GJurJqNsGzNBJFiPZfM/G/GtQKoqLG
+    eSqV9DNgsBK4szXpg1g0hhFfQ+fzgzCXdeTuI5YTbS0KtRT2J9NQmMp+LTs0UQRv
+    4sO+tsHswz9FInSCfzQBCdBQNip0ozrQOgFqxc91uO0F4jRDZh8rL6v9L3Qs1ruS
+    71PQ9BYGyf5Wiavt3ktlXk3k7aR/dM0UbGhQDJJwZqpyuoPC3x4s0GJpUIcWgXic
+    AIKt/nhehWkXmk3HDLUMwyFok1q277bBTg+kUPYm+DBVLb0ixTquYPDzAupJAjsn
+    m+5olp06QcsKasBesxHyJ7rPvSjXMmTFVdSYnU7n1Mkebh7US1t++6/kUl7SQiVi
+    SKvqIfXNRw2xsjWZEdvpYpyEWsqpWedUmUlIz63SIqNkuLxAg5yti55HgBCuTYzU
+    i/IGUlVAvUZ1YF/2IcRRRkk65iVJSSlRSf2r+vpS9vZ3le6o4bhcVjunIZkNrmXc
+    NlI0StLu5zFPUcYknex+yp8jE1O6rkk=
     -----END CERTIFICATE-----
     -----BEGIN CERTIFICATE-----
     MIIERjCCA+ygAwIBAgIUMGy4qpA0i6yEKf5D3pDAqTfiKh8wCgYIKoZIzj0EAwQw
@@ -208,7 +211,7 @@ spec:
     spec:
       containers:
       - name: discovery-agent
-        image: solace/event-management-agent:latest
+        image: solace/event-management-agent:1.9.7
         env:
           - name: SOLACE_CLOUD_TOKEN
             value: "eyJhbGciOiJSUzI1NiIsImtpZCI6Im1hYXNfcHJvZF8yMDIwMDMyNiIsInR5cCI6IkpXVCJ9.eyJvcmciOiIwbzdjdWE4N296NCIsIm9yZ1R5cGUiOiJUUklBTCIsInN1YiI6ImIyZHBkNGFwazI2IiwicGVybWlzc2lvbnMiOiJBQUFBQUpRdkFBQUFmemdBNEFFQUFBQUFBQUFBQUFBQUFJQ0J4b2NoQUFqZ0sxY0RnSURLQmQ0RFdNTUQ0NGU1TTRNWkVQaC9Cc0RJNHVjaHZPRUIiLCJhcGlUb2tlbklkIjoidnMwamo4MGpnOHUiLCJpc3MiOiJTb2xhY2UgQ29ycG9yYXRpb24iLCJpYXQiOjE3Njg0Nzk0NjJ9.Vsm3k9dNSn-VbQrLWeIPWctbQ_TAQrKv2Foh3qNfJa-WkckgYMtTrOSYa0rOB8M2GwkC3_7q6wN9j7Wm58Hr1f8f-jleJ2dlzNyHJ3o510uxAmxhWzNii7vs92vxEWn8goA5CaektB8BHw8EvPSiXYxpHqI-9RX8bG7evOh_ErS_3bgQmFYZCzhGjb6cs7yCS4B3d8VX3dMY5vsc9vJgl9LRBo0fcWtvfVTm6ongg37sj3Zkt1VNcO-kD0MZaaeyxbemxFfVehc5VQWHZO0kOvm9EzTFyU7Ebjz613zPWF-5COM9-XRHXTGapRKHxDMCLREJjpcFDxvdz09dsNZ5vA"
@@ -230,21 +233,52 @@ spec:
           #   value: "solace"
           - name: AGENT_NAME
             value: "K8s-Standalone-Agent"
-          - name: SOLACE_CLOUD_SSL_TRUST_STORE
-            value: "/etc/ssl/certs/solace.crt"
-          - name: SOLACE_CLOUD_SSL_VALIDATE_CERTIFICATE
-            value: "false"
-          - name: SOLACE_MESSAGING_TRANSPORT_SSL_TRUST_STORE_PATH
-            value: "/etc/ssl/certs/solace.crt"
-          - name: SOLACE_MESSAGING_TRANSPORT_SSL_TRUST_STORE_FORMAT
-            value: "PEM"
+          - name: LOGGING_LEVEL_ROOT
+            value: "INFO"
+          - name: LOGGING_LEVEL_COM_SOLACE
+            value: "INFO"
+          - name: LOGGING_LEVEL_COM_SOLACESYSTEMS
+            value: "INFO"
+          # - name: JAVA_OPTS
+          #   value: >-
+          #     -Djavax.net.ssl.trustStore=/etc/ssl/certs/solace.crt
+          #     -Djavax.net.ssl.trustStoreType=PEM
+          #     -Dsolace.messaging.transport.ssl.trust-store-path=/etc/ssl/certs/solace.crt
+          #     -Dsolace.messaging.transport.ssl.trust-store-format=PEM
+          #     -Dsolace.messaging.transport.ssl.validate-certificate=false
+          #     -Dsolace.eventportal.gateway.messaging.connections.0.ssl.truststore=/etc/ssl/certs/solace.crt
+          #     -Dsolace.eventportal.gateway.messaging.connections.0.ssl.truststoretype=PEM
+          #     -Dsolace.eventportal.gateway.messaging.connections.0.ssl.truststoreformat=PEM
+          #     -Dsolace.eventportal.gateway.messaging.connections.0.ssl.validatecertificate=false
+          #     -Dsolace.cloud.ssl.trust-store=/etc/ssl/certs/solace.crt
+          #     -Dsolace.cloud.ssl.validate-certificate=false
+          #     -Dsolace.cloud.ssl.trust-store-format=PEM
+          #     -Dspring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true 
+
+          # 2. Configuración específica para el Gateway del Event Portal
           - name: SOLACE_EVENTPORTAL_GATEWAY_MESSAGING_CONNECTIONS_0_SSL_TRUSTSTORE
             value: "/etc/ssl/certs/solace.crt"
           - name: SOLACE_EVENTPORTAL_GATEWAY_MESSAGING_CONNECTIONS_0_SSL_TRUSTSTORETYPE
             value: "PEM"
+          - name: SOLACE_EVENTPORTAL_GATEWAY_MESSAGING_CONNECTIONS_0_SSL_TRUSTSTOREFORMAT
+            value: "PEM"
+          # Intenta poner esto en false explícitamente para ver si el error desaparece
           - name: SOLACE_EVENTPORTAL_GATEWAY_MESSAGING_CONNECTIONS_0_SSL_VALIDATECERTIFICATE
             value: "false"
-
+          # 3. Configuración para el componente Cloud (Registro del agente)
+          - name: SOLACE_CLOUD_SSL_TRUST_STORE
+            value: "/etc/ssl/certs/solace.crt"
+          - name: SOLACE_CLOUD_SSL_VALIDATE_CERTIFICATE
+            value: "false"
+          - name: SOLACE_CLOUD_SSL_TRUST_STORE_FORMAT
+            value: "PEM"
+          # 4. Configuración genérica de transporte (Solace Messaging)
+          - name: SOLACE_MESSAGING_TRANSPORT_SSL_TRUST_STORE_PATH
+            value: "/etc/ssl/certs/solace.crt"
+          - name: SOLACE_MESSAGING_TRANSPORT_SSL_TRUST_STORE_FORMAT
+            value: "PEM"
+          - name: SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION
+            value: "true"
         volumeMounts:
           - name: ema-config-volume
             mountPath: /config/ema.yml
@@ -289,11 +323,11 @@ spec:
         image: solace/solace-pubsub-standard:10.25.13
         resources:
           requests:
-            cpu: 4000m  # Adjust CPU request if needed
-            memory: 8.0Gi  # Increase memory request to 2.5 GiB (or slightly higher)
+            cpu: 3000m  # Adjust CPU request if needed
+            memory: 6.0Gi  # Increase memory request to 2.5 GiB (or slightly higher)
           limits:
-            cpu: 4000m  # Adjust CPU limit if needed
-            memory: 8.0Gi
+            cpu: 3000m  # Adjust CPU limit if needed
+            memory: 6.0Gi
         volumeMounts:
            - mountPath: /dev/shm
              name: dshm

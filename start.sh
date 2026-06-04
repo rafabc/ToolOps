@@ -37,6 +37,7 @@ source ./kubernetes/linkerd/install.sh
 source ./kubernetes/linkerd/uninstall.sh
 
 source ./kubernetes/keycloak/install.sh
+source ./kubernetes/keycloak/check.sh
 source ./kubernetes/keycloak/uninstall.sh
 
 source ./kubernetes/confluent/install.sh

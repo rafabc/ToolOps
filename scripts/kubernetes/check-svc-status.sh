@@ -1,20 +1,21 @@
-
+#!/bin/bash
 
 function check_svc_status() {
     NAMESPACE=$1
     SERVICE_NAME=$2
     msg "CHECKING SERVICE" "$SERVICE_NAME STATUS"
-    SERVICE=$(kubectl get svc -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}')
-
-    if [ -z "$SERVICE" ]; then
-        msg_error "❌ No service found for $SERVICE_NAME in namespace $NAMESPACE"
+    
+    # 1. Comprobamos si el servicio existe apuntando directamente a él
+    # Redirigimos el stderr a /dev/null para que no ensucie tu salida customizada
+    if ! SERVICE=$(kubectl get svc "$SERVICE_NAME" -n "$NAMESPACE" -o jsonpath='{.metadata.name}' 2>/dev/null); then
+        msg_error "No service found for $SERVICE_NAME in namespace $NAMESPACE"
         return 1
     else
         msg_check_success "✅ Service $SERVICE_NAME found in namespace $NAMESPACE"
     fi
 
-
-    ENDPOINTS=$(kubectl get endpoints $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.subsets[*].addresses[*].ip}')
+    # 2. Comprobación de Endpoints (Quitamos el index [0] para evitar fallos similares si subsets está vacío)
+    ENDPOINTS=$(kubectl get endpoints "$SERVICE_NAME" -n "$NAMESPACE" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null)
 
     if [ -z "$ENDPOINTS" ]; then
         msg_check_fail "⚠️ El servicio existe pero NO tiene pods listos (0 Endpoints)"
@@ -27,10 +28,9 @@ function check_svc_status() {
     SECONDS_ELAPSED=0
     SLEEP_INTERVAL=2
 
-
     while [ -z "$EXTERNAL_IP" ]; do
-        # Intentamos obtener tanto hostname como ip (por si usas AWS o Bare Metal/GCP)
-        EXTERNAL_IP=$(kubectl get svc "$SERVICE_NAME" -n "$NAMESPACE" -o jsonpath='{.status.loadBalancer.ingress[0].hostname}{.status.loadBalancer.ingress[0].ip}')
+        # Intentamos obtener tanto hostname como ip
+        EXTERNAL_IP=$(kubectl get svc "$SERVICE_NAME" -n "$NAMESPACE" -o jsonpath='{.status.loadBalancer.ingress[0].hostname}{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
         
         if [ -z "$EXTERNAL_IP" ]; then
             if [ "$SECONDS_ELAPSED" -ge "$TIMEOUT" ]; then
@@ -46,7 +46,7 @@ function check_svc_status() {
     done
 
     if [ "$VERBOSE" = "1" ] || [ "$VERBOSE" = "true" ]; then
-        kubectl get svc $SERVICE -n $NAMESPACE
+        # Usamos $SERVICE_NAME que es más seguro
+        kubectl get svc "$SERVICE_NAME" -n "$NAMESPACE"
     fi
 }
-

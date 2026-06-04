@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package opentelemetry.proto.logs.v1;
+
+// Mensaje raíz para la exportación de Logs
+message ExportLogsServiceRequest {
+  repeated ResourceLogs resource_logs = 1;
+}
+
+// Logs agrupados por un recurso común
+message ResourceLogs {
+  Resource resource = 1;
+  repeated ScopeLogs scope_logs = 2;
+}
+
+// Atributos del recurso emisor
+message Resource {
+  repeated KeyValue attributes = 1;
+}
+
+// Colección de registros de log dentro de un ámbito (scope)
+message ScopeLogs {
+  repeated LogRecord log_records = 1;
+}
+
+// El registro de Log individual
+message LogRecord {
+  uint64 time_unix_nano = 1;
+  string trace_id = 2;
+  string span_id = 3;
+  AnyValue body = 4;
+  repeated KeyValue attributes = 5;
+}
+
+// Estructura genérica clave-valor para atributos
+message KeyValue {
+  string key = 1;
+  AnyValue value = 2;
+}
+
+// Contenedor dinámico capaz de recibir múltiples tipos de datos
+message AnyValue {
+  oneof value {
+    string string_value = 1;
+    int64 int_value = 2;
+    double double_value = 3;
+    bool bool_value = 4;
+  }
+}

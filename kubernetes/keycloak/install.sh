@@ -2,7 +2,8 @@
 
 function install_keycloak() {
 
-	NAMESPACE="keycloak"
+	# NAMESPACE="keycloak"
+	NAMESPACE="solace"
 
 	create_namespace $NAMESPACE
 

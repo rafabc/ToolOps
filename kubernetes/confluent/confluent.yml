@@ -21,7 +21,7 @@ spec:
     name: hostpath
   image:
     application: docker.io/confluentinc/cp-server:8.1.2
-    init: confluentinc/confluent-init-container:2.8.0
+    init: confluentinc/confluent-init-container:3.2.1
   replicas: 1
 ---
 apiVersion: platform.confluent.io/v1beta1
@@ -33,7 +33,7 @@ spec:
   replicas: 3
   image:
     application: confluentinc/cp-server:8.1.2
-    init: confluentinc/confluent-init-container:2.8.0
+    init: confluentinc/confluent-init-container:3.2.1
   dataVolumeCapacity: 10Gi
   # resources:
   #     requests:
@@ -68,8 +68,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-server-connect:7.6.0
-    init: confluentinc/confluent-init-container:2.8.0
+    application: confluentinc/cp-server-connect:8.1.2
+    init: confluentinc/confluent-init-container:3.2.1
   dependencies:
     kafka:
       bootstrapEndpoint: kafka:9071
@@ -83,7 +83,7 @@ spec:
   replicas: 1
   image:
     application: confluentinc/cp-ksqldb-server:8.1.2
-    init: confluentinc/confluent-init-container:2.8.0
+    init: confluentinc/confluent-init-container:3.2.1
   dataVolumeCapacity: 10Gi
 ---
 apiVersion: platform.confluent.io/v1beta1
@@ -94,8 +94,8 @@ metadata:
 spec:
   replicas: 1
   image:
-    application: confluentinc/cp-schema-registry:7.6.0
-    init: confluentinc/confluent-init-container:2.8.0
+    application: confluentinc/cp-schema-registry:8.1.2
+    init: confluentinc/confluent-init-container:3.2.1
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: KafkaRestProxy
@@ -106,7 +106,7 @@ spec:
   replicas: 1
   image:
     application: confluentinc/cp-kafka-rest:8.1.2
-    init: confluentinc/confluent-init-container:2.8.0
+    init: confluentinc/confluent-init-container:3.2.1
   # resources:
   #     requests:
   #       cpu: 500m

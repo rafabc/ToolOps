@@ -302,14 +302,7 @@ function kube_check() {
         linkerd check --verbose
         ;;
     5)
-        msg "Check Keycloak status"
-        KEYCLOAK_POD=$(kubectl get pods -n keycloak -l app=keycloak -o jsonpath='{.items[0].metadata.name}')
-        STATUS=$(kubectl get pod $KEYCLOAK_POD -n keycloak -o jsonpath='{.status.phase}')
-        if [ "$STATUS" == "Running" ]; then
-            msg_check_success "POD Keycloak $KEYCLOAK_POD Status: $STATUS"
-        else
-            msg_check_fail "POD Keycloak $KEYCLOAK_POD Status: $STATUS"
-        fi
+        check_keycloak
         ;;
     6)
         check_confluent

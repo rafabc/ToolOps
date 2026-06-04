@@ -1,16 +1,16 @@
 #!/bin/bash
 
 
-function check_activemq() {
+function check_keycloak() {
 
     clear
-    NAMESPACE="active-mq"
+    NAMESPACE="keycloak"
 
     msg_task "Checking $NAMESPACE Status"
     echo
 
-    POD_NAME="active-mq"
-    SERVICE_NAME="active-mq"
+    POD_NAME="keycloak"
+    SERVICE_NAME="keycloak"
     check_pod_status $NAMESPACE $POD_NAME
     echo
     check_svc_status $NAMESPACE $SERVICE_NAME

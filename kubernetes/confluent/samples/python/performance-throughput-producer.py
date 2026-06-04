@@ -26,7 +26,7 @@ KAFKA_CONFIG = {
 
 TOPIC = 'test_throughput'
 MESSAGE_SIZE = 1024 # 1KB
-DURATION = 60       # 1 minuto en segundos
+DURATION = 10       
 
 # --- MÉTRICAS ---
 latencies = []

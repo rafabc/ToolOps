@@ -2,8 +2,6 @@
 
 function install_confluent() {
 
-	#  export TUTORIAL_HOME="https://raw.githubusercontent.com/confluentinc/confluent-kubernetes-examples/master/quickstart-deploy/kraft-quickstart"
-
 	NAMESPACE="confluent"
 	create_namespace $NAMESPACE
 

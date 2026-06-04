@@ -4,6 +4,7 @@ FIXED_LENGTH=50
 
 function launch_menu_platform() {
     clear
+    echo
     msg_task "Select destination platform"
     printf "\n%s$GREEN_BOLD%s"
     OPT1=$(printf "%-${FIXED_LENGTH}s$GREEN_BOLD%s %2s" "%4s$ARROW  DOCKER COMPOSE")

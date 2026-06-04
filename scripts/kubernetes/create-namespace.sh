@@ -26,7 +26,7 @@ function create_namespace() {
         msg "Namespace $NAMESPACE localizado, no es necesaria su creacion"
     else
         msg_warn "Namespace $NAMESPACE no existe - se procede a su creacion"
-        msg "Applying $NAMESPACE namespace"
+        msg "Applying namespace $NAMESPACE"
 
         if [ ! -f namespace.yml ]; then
             msg_warn "El fichero namespace.yml no existe en $PWD"

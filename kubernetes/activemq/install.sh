@@ -8,15 +8,8 @@
 function install_activemq() {
 
 	NAMESPACE="active-mq"
-
-	create_namespace $NAMESPACE
-
-	if [ "$VERBOSE" -eq 1 ]; then
-		msg_info "Pods"
-		kubectl get pods
-	fi
-
-	apply_resources "activemq.yml"
+	START=$(date +%s.%N)
+	create_resources "activemq.yml" $NAMESPACE
 	msg "Waiting for ActiveMQ pods to be running..."
 	wait_pod_running "active-mq"
 
@@ -26,5 +19,7 @@ function install_activemq() {
 	port_forward "8448" "61616" active-mq #openwire
 	port_forward "8558" "61613" active-mq  #stomp
 	port_forward "8668" "5672" active-mq #amqp
+
+	msg_ok "ActiveMQ installed successfully"
 
 }	

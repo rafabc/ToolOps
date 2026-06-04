@@ -15,6 +15,7 @@ source ./scripts/spinner.sh
 
 
 source ./scripts/kubernetes.sh
+source ./scripts/kubernetes/create-resources.sh
 source ./scripts/kubernetes/create-namespace.sh
 source ./scripts/kubernetes/delete-namespace.sh
 source ./scripts/kubernetes/delete-resources.sh
